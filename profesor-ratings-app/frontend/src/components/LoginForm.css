@@ -41,3 +41,119 @@
 .login-link a:hover {
   text-decoration: underline;
 }
+
+/* Estilo para el enlace de recuperación de contraseña */
+.forgot-link {
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.forgot-link a {
+  color: #e74c3c; /* rojo para diferenciarlo del enlace de registro */
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.forgot-link a:hover {
+  text-decoration: underline;
+}
+
+/* Estilos para el formulario de reset password */
+.reset-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80vh;
+  padding: 2rem;
+}
+
+.reset-form {
+  background: white;
+  padding: 3rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+}
+
+.reset-form h2 {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #2c3e50;
+}
+
+.reset-form .form-group {
+  margin-bottom: 1.5rem;
+}
+
+.reset-form input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.reset-form button {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #27ae60; /* verde */
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.reset-form button:hover {
+  background-color: #219150; /* verde más oscuro */
+}
+
+/* Estilos para el formulario de forgot password */
+.forgot-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80vh;
+  padding: 2rem;
+}
+
+.forgot-form {
+  background: white;
+  padding: 3rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+}
+
+.forgot-form h2 {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #2c3e50;
+}
+
+.forgot-form .form-group {
+  margin-bottom: 1.5rem;
+}
+
+.forgot-form input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.forgot-form button {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #e67e22; /* naranja */
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.forgot-form button:hover {
+  background-color: #d35400; /* naranja más oscuro */
+}

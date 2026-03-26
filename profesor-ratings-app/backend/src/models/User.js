@@ -1,6 +1,5 @@
 const pool = require('../config/database');
 
-// Estructura de respuesta estándar
 class UserModel {
   static async create(userData) {
     const { registro_academico, nombres, apellidos, email, password_hash } = userData;
@@ -31,13 +30,13 @@ class UserModel {
   }
 
   static async findById(id) {
-    const query = 'SELECT id, registro_academico, nombres, apellidos, email, fecha_creacion FROM usuarios WHERE id = ?';
+    const query = 'SELECT * FROM usuarios WHERE id = ?';
     const [rows] = await pool.execute(query, [id]);
     return rows[0] || null;
   }
 
   static async findByRegistroAcademico(registro_academico) {
-    const query = 'SELECT id, registro_academico, nombres, apellidos, email, fecha_creacion FROM usuarios WHERE registro_academico = ?';
+    const query = 'SELECT * FROM usuarios WHERE registro_academico = ?';
     const [rows] = await pool.execute(query, [registro_academico]);
     return rows[0] || null;
   }
@@ -53,6 +52,18 @@ class UserModel {
     
     await pool.execute(query, [...values, id]);
     return this.findById(id);
+  }
+
+  // 🔹 Nuevo: guardar token de recuperación
+  static async updateResetToken(id, token) {
+    const query = 'UPDATE usuarios SET reset_token = ? WHERE id = ?';
+    await pool.execute(query, [token, id]);
+  }
+
+  // 🔹 Nuevo: actualizar contraseña
+  static async updatePassword(id, newHash) {
+    const query = 'UPDATE usuarios SET password_hash = ? WHERE id = ?';
+    await pool.execute(query, [newHash, id]);
   }
 }
 

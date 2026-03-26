@@ -1,17 +1,17 @@
 const app = require('./src/app');
-const migrate = require('./src/config/migrate');
+const migrate = require('./src/config/migrate'); // ← LÍNEA NUEVA
 require('dotenv').config();
 
 const PORT = process.env.PORT || 5000;
 
-migrate()
-  .then(() => {
+// Primero crea las tablas, luego inicia el servidor
+migrate()                                           // ← LÍNEA NUEVA
+  .then(() => {                                       // ← LÍNEA NUEVA
     app.listen(PORT, () => {
       console.log(`Servidor corriendo en puerto ${PORT}`);
-      console.log(`URL: http://localhost:${PORT}`);
     });
-  })
-  .catch((err) => {
-    console.error('Error en migración:', err);
-    process.exit(1);
-  });
+  })                                                  // ← LÍNEA NUEVA
+  .catch((err) => {                                   // ← LÍNEA NUEVA
+    console.error('Error en migración:', err);       // ← LÍNEA NUEVA
+    process.exit(1);                                 // ← LÍNEA NUEVA
+  });                                                 // ← LÍNEA NUEVA
