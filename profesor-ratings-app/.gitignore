@@ -1,0 +1,35 @@
+# Dependencias
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Variables de entorno
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Construcción
+build/
+dist/
+.DS_Store
+
+# Logs
+*.log
+
+# Sistema operativo
+Thumbs.db
+.DS_Store
+
+# Rutas
+.history/
+
+# SQLite (si se usa)
+*.db
+*.sqlite

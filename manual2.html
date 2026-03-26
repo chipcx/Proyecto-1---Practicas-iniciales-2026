@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guía de Deploy — Rating de Catedráticos</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --surface2: #1a1a26;
+    --border: #2a2a3d;
+    --accent: #7c5cfc;
+    --accent2: #00d4aa;
+    --accent3: #ff6b6b;
+    --text: #e8e8f0;
+    --muted: #6b6b8a;
+    --code-bg: #0d0d15;
+    --railway: #7c5cfc;
+    --vercel: #00d4aa;
+    --mysql: #ff6b6b;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* Background pattern */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: 
+      radial-gradient(circle at 20% 20%, rgba(124,92,252,0.08) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(0,212,170,0.06) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 60px 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    margin-bottom: 64px;
+    padding-bottom: 48px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .header .tag {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    background: rgba(124,92,252,0.1);
+    border: 1px solid rgba(124,92,252,0.3);
+    padding: 4px 12px;
+    border-radius: 100px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+
+  .header h1 {
+    font-size: clamp(32px, 5vw, 52px);
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 16px;
+    background: linear-gradient(135deg, #fff 0%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .header p {
+    color: var(--muted);
+    font-size: 16px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* Stack badges */
+  .stack-badges {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 24px;
+  }
+
+  .badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+
+  .badge-railway { background: rgba(124,92,252,0.15); color: var(--railway); border: 1px solid rgba(124,92,252,0.3); }
+  .badge-vercel { background: rgba(0,212,170,0.15); color: var(--vercel); border: 1px solid rgba(0,212,170,0.3); }
+  .badge-mysql { background: rgba(255,107,107,0.15); color: var(--mysql); border: 1px solid rgba(255,107,107,0.3); }
+  .badge-node { background: rgba(100,200,80,0.15); color: #64c850; border: 1px solid rgba(100,200,80,0.3); }
+  .badge-react { background: rgba(97,218,251,0.15); color: #61dafb; border: 1px solid rgba(97,218,251,0.3); }
+
+  /* Arquitectura */
+  .arch-diagram {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+    margin-bottom: 48px;
+    text-align: center;
+  }
+
+  .arch-diagram h2 {
+    font-size: 13px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-family: 'JetBrains Mono', monospace;
+    margin-bottom: 28px;
+  }
+
+  .arch-flow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .arch-box {
+    padding: 14px 20px;
+    border-radius: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    min-width: 140px;
+  }
+
+  .arch-box.frontend { background: rgba(97,218,251,0.1); border: 1px solid rgba(97,218,251,0.3); color: #61dafb; }
+  .arch-box.backend { background: rgba(124,92,252,0.1); border: 1px solid rgba(124,92,252,0.3); color: var(--railway); }
+  .arch-box.db { background: rgba(255,107,107,0.1); border: 1px solid rgba(255,107,107,0.3); color: var(--mysql); }
+
+  .arch-box .label { font-size: 10px; opacity: 0.7; display: block; margin-top: 4px; font-weight: 400; }
+
+  .arch-arrow {
+    color: var(--muted);
+    font-size: 20px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* Sections */
+  .section {
+    margin-bottom: 48px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .step-number {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+
+  .step-number.railway { background: rgba(124,92,252,0.2); color: var(--railway); border: 1px solid rgba(124,92,252,0.4); }
+  .step-number.vercel { background: rgba(0,212,170,0.2); color: var(--vercel); border: 1px solid rgba(0,212,170,0.4); }
+  .step-number.db { background: rgba(255,107,107,0.2); color: var(--mysql); border: 1px solid rgba(255,107,107,0.4); }
+  .step-number.code { background: rgba(100,200,80,0.2); color: #64c850; border: 1px solid rgba(100,200,80,0.4); }
+
+  .section-title {
+    font-size: 22px;
+    font-weight: 800;
+  }
+
+  .section-subtitle {
+    font-size: 13px;
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    margin-top: 2px;
+  }
+
+  /* Cards */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 16px;
+  }
+
+  .card h3 {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: var(--text);
+  }
+
+  .steps-list {
+    list-style: none;
+    counter-reset: steps;
+  }
+
+  .steps-list li {
+    counter-increment: steps;
+    display: flex;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+    align-items: flex-start;
+  }
+
+  .steps-list li:last-child { border-bottom: none; }
+
+  .steps-list li::before {
+    content: counter(steps);
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* Code blocks */
+  .code-block {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    overflow-x: auto;
+    margin: 12px 0;
+    position: relative;
+  }
+
+  .code-block .file-label {
+    font-size: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: block;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .code-block code {
+    color: var(--accent2);
+    line-height: 1.8;
+  }
+
+  .code-block .comment { color: var(--muted); }
+  .code-block .key { color: #ff9f43; }
+  .code-block .val { color: var(--accent2); }
+  .code-block .cmd { color: #61dafb; }
+
+  /* Warning / tip boxes */
+  .tip {
+    border-radius: 10px;
+    padding: 14px 18px;
+    font-size: 13px;
+    margin: 16px 0;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .tip-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+  .tip.warning { background: rgba(255,107,107,0.08); border: 1px solid rgba(255,107,107,0.2); color: #ff9a9a; }
+  .tip.info { background: rgba(124,92,252,0.08); border: 1px solid rgba(124,92,252,0.2); color: #b8a4ff; }
+  .tip.success { background: rgba(0,212,170,0.08); border: 1px solid rgba(0,212,170,0.2); color: #80ffe8; }
+
+  /* Variables table */
+  .vars-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    margin-top: 12px;
+  }
+
+  .vars-table th {
+    text-align: left;
+    padding: 8px 12px;
+    background: var(--surface2);
+    color: var(--muted);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .vars-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+
+  .vars-table tr:last-child td { border-bottom: none; }
+
+  .vars-table .var-name { color: #ff9f43; }
+  .vars-table .var-val { color: var(--accent2); word-break: break-all; }
+  .vars-table .var-note { color: var(--muted); font-size: 11px; }
+
+  /* URLs finales */
+  .urls-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 16px;
+  }
+
+  @media (max-width: 600px) { .urls-grid { grid-template-columns: 1fr; } }
+
+  .url-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+  }
+
+  .url-card .url-label {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-family: 'JetBrains Mono', monospace;
+    margin-bottom: 8px;
+  }
+
+  .url-card .url-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    word-break: break-all;
+  }
+
+  .url-card.frontend .url-value { color: #61dafb; }
+  .url-card.backend .url-value { color: var(--railway); }
+
+  /* Errores comunes */
+  .error-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent3);
+    border-radius: 0 12px 12px 0;
+    padding: 16px 20px;
+    margin-bottom: 12px;
+  }
+
+  .error-card .error-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--accent3);
+    margin-bottom: 6px;
+    font-weight: 700;
+  }
+
+  .error-card .error-cause {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  .error-card .error-fix {
+    font-size: 13px;
+    color: var(--text);
+  }
+
+  /* Divider */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 48px 0;
+  }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    padding-top: 32px;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+  }
+
+  inline-code {
+    font-family: 'JetBrains Mono', monospace;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    color: var(--accent2);
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="tag">USAC · Ingeniería · Desarrollo Web</div>
+    <h1>Guía de Deploy<br>Rating de Catedráticos</h1>
+    <p>Railway + Vercel · Deploy gratuito desde GitHub</p>
+    <div class="stack-badges">
+      <span class="badge badge-react">React.js</span>
+      <span class="badge badge-node">Node.js + Express</span>
+      <span class="badge badge-mysql">MySQL</span>
+      <span class="badge badge-railway">Railway</span>
+      <span class="badge badge-vercel">Vercel</span>
+    </div>
+  </div>
+
+  <!-- Arquitectura -->
+  <div class="arch-diagram">
+    <h2>Arquitectura del Deploy</h2>
+    <div class="arch-flow">
+      <div class="arch-box frontend">
+        React.js
+        <span class="label">Vercel · puerto 3000</span>
+      </div>
+      <div class="arch-arrow">→ HTTP →</div>
+      <div class="arch-box backend">
+        Express.js
+        <span class="label">Railway · puerto 5000</span>
+      </div>
+      <div class="arch-arrow">→ SQL →</div>
+      <div class="arch-box db">
+        MySQL 8
+        <span class="label">Railway · puerto 3306</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- PASO 1: Railway cuenta -->
+  <div class="section">
+    <div class="section-header">
+      <div class="step-number railway">1</div>
+      <div>
+        <div class="section-title">Crear cuenta en Railway</div>
+        <div class="section-subtitle">railway.app — backend + base de datos</div>
+      </div>
+    </div>
+    <div class="card">
+      <ul class="steps-list">
+        <li>Ve a <strong>railway.app</strong> y haz clic en <strong>"Login"</strong></li>
+        <li>Selecciona <strong>"Login with GitHub"</strong> y autoriza</li>
+        <li>Listo — ya tienes cuenta con plan gratuito</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- PASO 2: MySQL en Railway -->
+  <div class="section">
+    <div class="section-header">
+      <div class="step-number db">2</div>
+      <div>
+        <div class="section-title">Crear base de datos MySQL</div>
+        <div class="section-subtitle">Railway auto-genera las credenciales</div>
+      </div>
+    </div>
+    <div class="card">
+      <ul class="steps-list">
+        <li>En Railway clic en <strong>"New Project"</strong></li>
+        <li>Clic en <strong>"Add a service"</strong> → <strong>"Database"</strong> → <strong>"MySQL"</strong></li>
+        <li>Espera ~1 minuto hasta que el servicio esté activo</li>
+        <li>Clic en el servicio MySQL → pestaña <strong>"Variables"</strong> — guarda esos valores</li>
+      </ul>
+    </div>
+    <div class="tip info">
+      <span class="tip-icon">ℹ️</span>
+      <span>Railway genera automáticamente <strong>MYSQLHOST, MYSQLUSER, MYSQLPASSWORD, MYSQLDATABASE, MYSQLPORT</strong>. Las usaremos como referencias en el backend.</span>
+    </div>
+  </div>
+
+  <!-- PASO 3: Schema -->
+  <div class="section">
+    <div class="section-header">
+      <div class="step-number db">3</div>
+      <div>
+        <div class="section-title">Cargar las tablas con TablePlus</div>
+        <div class="section-subtitle">Conectar a MySQL de Railway y ejecutar el schema</div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Instalar TablePlus</h3>
+      <ul class="steps-list">
+        <li>Ve a <strong>tableplus.com</strong> y descarga la versión gratuita</li>
+        <li>Instala y abre</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Conectar a Railway</h3>
+      <ul class="steps-list">
+        <li>Clic en <strong>"Create a new connection"</strong> → selecciona <strong>MySQL</strong></li>
+        <li>Llena con los datos de Railway:</li>
+      </ul>
+      <div class="code-block">
+        <code>
+Host:     caboose.proxy.rlwy.net  <span class="comment">(tu MYSQL_PUBLIC_URL)</span><br>
+Port:     58025  <span class="comment">(el puerto de tu URL pública)</span><br>
+User:     root<br>
+Password: <span class="val">[MYSQL_ROOT_PASSWORD de Railway]</span><br>
+Database: railway
+        </code>
+      </div>
+      <ul class="steps-list">
+        <li>Clic en <strong>"Test"</strong> — debe salir verde ✅</li>
+        <li>Clic en <strong>"Connect"</strong></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Ejecutar el schema</h3>
+      <ul class="steps-list">
+        <li>Presiona <strong>Ctrl+Q</strong> para abrir el editor SQL</li>
+        <li>Abre el archivo <strong>database/schema.sql</strong> del proyecto</li>
+      </ul>
+      <div class="tip warning">
+        <span class="tip-icon">⚠️</span>
+        <span><strong>Importante:</strong> Borrar las líneas <code>CREATE DATABASE IF NOT EXISTS profesor_ratings</code> y <code>USE profesor_ratings</code> del schema antes de ejecutar. Railway ya tiene su propia base de datos llamada <strong>railway</strong>.</span>
+      </div>
+      <ul class="steps-list">
+        <li>Ejecutar cada <strong>CREATE TABLE</strong> por separado con <strong>"Run Current"</strong></li>
+        <li>Verificar que aparezcan las 7 tablas en el panel izquierdo</li>
+      </ul>
+    </div>
+    <div class="tip success">
+      <span class="tip-icon">✅</span>
+      <span>Tablas esperadas: <strong>usuarios, catedraticos, cursos, curso_catedratico, publicaciones, comentarios, cursos_aprobados</strong></span>
+    </div>
+  </div>
+
+  <!-- PASO 4: Backend -->
+  <div class="section">
+    <div class="section-header">
+      <div class="step-number railway">4</div>
+      <div>
+        <div class="section-title">Deploy del Backend en Railway</div>
+        <div class="section-subtitle">Express.js conectado a MySQL</div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Agregar el servicio</h3>
+      <ul class="steps-list">
+        <li>En el mismo proyecto Railway clic en <strong>"Add a service"</strong></li>
+        <li>Selecciona <strong>"GitHub Repo"</strong></li>
+        <li>Busca y selecciona tu repositorio</li>
+      </ul>
+      <div class="tip info">
+        <span class="tip-icon">ℹ️</span>
+        <span>Si el repo no aparece, clic en <strong>"Configure GitHub App"</strong> y da acceso al repositorio desde GitHub.</span>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Configurar Root Directory</h3>
+      <ul class="steps-list">
+        <li>Ve a <strong>Settings</strong> del servicio</li>
+        <li>En <strong>"Root Directory"</strong> escribe:</li>
+      </ul>
+      <div class="code-block">
+        <code>profesor-ratings-app/backend</code>
+      </div>
+      <div class="tip warning">
+        <span class="tip-icon">⚠️</span>
+        <span>La ruta depende de cómo quedó el ZIP al subirse. Verificar la estructura en GitHub antes de escribir la ruta.</span>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Variables de entorno</h3>
+      <p style="font-size:13px; color:var(--muted); margin-bottom:12px;">Ve a la pestaña <strong>Variables</strong> y agrega usando <strong>"Add Reference"</strong> para las de MySQL:</p>
+      <table class="vars-table">
+        <thead>
+          <tr>
+            <th>Variable</th>
+            <th>Valor</th>
+            <th>Tipo</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="var-name">DB_HOST</td>
+            <td class="var-val">$&#123;&#123;MySQL.MYSQLHOST&#125;&#125;</td>
+            <td class="var-note">Referencia</td>
+          </tr>
+          <tr>
+            <td class="var-name">DB_USER</td>
+            <td class="var-val">$&#123;&#123;MySQL.MYSQLUSER&#125;&#125;</td>
+            <td class="var-note">Referencia</td>
+          </tr>
+          <tr>
+            <td class="var-name">DB_PASSWORD</td>
+            <td class="var-val">$&#123;&#123;MySQL.MYSQLPASSWORD&#125;&#125;</td>
+            <td class="var-note">Referencia</td>
+          </tr>
+          <tr>
+            <td class="var-name">DB_NAME</td>
+            <td class="var-val">$&#123;&#123;MySQL.MYSQLDATABASE&#125;&#125;</td>
+            <td class="var-note">Referencia</td>
+          </tr>
+          <tr>
+            <td class="var-name">DB_PORT</td>
+            <td class="var-val">$&#123;&#123;MySQL.MYSQLPORT&#125;&#125;</td>
+            <td class="var-note">Referencia</td>
+          </tr>
+          <tr>
+            <td class="var-name">PORT</td>
+            <td class="var-val">5000</td>
+            <td class="var-note">Texto</td>
+          </tr>
+          <tr>
+            <td class="var-name">NODE_ENV</td>
+            <td class="var-val">production</td>
+            <td class="var-note">Texto</td>
+          </tr>
+          <tr>
+            <td class="var-name">JWT_SECRET</td>
+            <td class="var-val">jwt_secure_key_usac_2026</td>
+            <td class="var-note">Texto</td>
+          </tr>
+          <tr>
+            <td class="var-name">JWT_EXPIRE</td>
+            <td class="var-val">7d</td>
+            <td class="var-note">Texto</td>
+          </tr>
+          <tr>
+            <td class="var-name">CORS_ORIGIN</td>
+            <td class="var-val">*</td>
+            <td class="var-note">Texto</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card">
+      <h3>Generar dominio público</h3>
+      <ul class="steps-list">
+        <li>Ve a <strong>Settings → Networking</strong></li>
+        <li>Clic en <strong>"Generate Domain"</strong></li>
+        <li>Copia la URL generada — la necesitarás para el frontend</li>
+      </ul>
+    </div>
+    <div class="tip success">
+      <span class="tip-icon">✅</span>
+      <span>Verificar que el backend esté activo accediendo a: <strong>https://tu-dominio.railway.app/api/health</strong> — debe responder con JSON.</span>
+    </div>
+  </div>
+
+  <!-- PASO 5: Código frontend -->
+  <div class="section">
+    <div class="section-header">
+      <div class="step-number code">5</div>
+      <div>
+        <div class="section-title">Ajuste en el código del frontend</div>
+        <div class="section-subtitle">Cambio obligatorio antes del deploy</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="tip warning">
+        <span class="tip-icon">⚠️</span>
+        <span><strong>Este paso es crítico.</strong> El archivo <code>frontend/src/services/api.js</code> tiene la URL hardcodeada como localhost. Hay que cambiarlo para que use la variable de entorno.</span>
+      </div>
+      <div class="code-block">
+        <span class="file-label">frontend/src/services/api.js — ANTES ❌</span>
+        <code><span class="key">const</span> API_URL = <span class="val">'http://localhost:5000/api'</span>;</code>
+      </div>
+      <div class="code-block">
+        <span class="file-label">frontend/src/services/api.js — DESPUÉS ✅</span>
+        <code><span class="key">const</span> API_URL = process.env.<span class="val">REACT_APP_API_URL</span> || <span class="val">'http://localhost:5000/api'</span>;</code>
+      </div>
+      <ul class="steps-list">
+        <li>Hacer el cambio en VS Code</li>
+        <li>Commit y push a GitHub (con GitKraken o terminal)</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- PASO 6: Vercel -->
+  <div class="section">
+    <div class="section-header">
+      <div class="step-number vercel">6</div>
+      <div>
+        <div class="section-title">Deploy del Frontend en Vercel</div>
+        <div class="section-subtitle">React.js — deploy automático desde GitHub</div>
+      </div>
+    </div>
+    <div class="card">
+      <ul class="steps-list">
+        <li>Ve a <strong>vercel.com</strong> → <strong>"Sign Up"</strong> → <strong>"Continue with GitHub"</strong></li>
+        <li>Clic en <strong>"Add New Project"</strong> → busca el repo</li>
+        <li>En <strong>"Root Directory"</strong> escribe: <code>profesor-ratings-app/frontend</code></li>
+        <li>En <strong>"Environment Variables"</strong> agrega:</li>
+      </ul>
+      <div class="code-block">
+        <code>
+<span class="key">REACT_APP_API_URL</span>=<span class="val">https://tu-dominio.railway.app/api</span>
+        </code>
+      </div>
+      <ul class="steps-list">
+        <li>Clic en <strong>"Deploy"</strong> — Vercel construye y despliega automáticamente</li>
+        <li>Esperar que el status diga <strong>"Ready"</strong></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Errores comunes -->
+  <hr class="divider">
+  <div class="section">
+    <div class="section-header">
+      <div class="step-number" style="background:rgba(255,107,107,0.2);color:var(--accent3);border:1px solid rgba(255,107,107,0.4);">!</div>
+      <div>
+        <div class="section-title">Errores comunes y soluciones</div>
+        <div class="section-subtitle">Problemas que ocurrieron durante el deploy</div>
+      </div>
+    </div>
+
+    <div class="error-card">
+      <div class="error-title">Failed to open the referenced table 'cursos'</div>
+      <div class="error-cause">❌ Causa: El schema incluye CREATE DATABASE y USE profesor_ratings al inicio.</div>
+      <div class="error-fix">✅ Solución: Borrar esas dos líneas del schema antes de ejecutar en TablePlus. Railway ya usa su propia base de datos "railway".</div>
+    </div>
+
+    <div class="error-card">
+      <div class="error-title">Query syntax error near '' at line 1</div>
+      <div class="error-cause">❌ Causa: TablePlus no ejecuta múltiples queries separadas por punto y coma en un solo run.</div>
+      <div class="error-fix">✅ Solución: Ejecutar cada CREATE TABLE por separado con "Run Current".</div>
+    </div>
+
+    <div class="error-card">
+      <div class="error-title">ERR_CONNECTION_REFUSED — localhost:5000</div>
+      <div class="error-cause">❌ Causa: El archivo api.js tiene la URL hardcodeada como localhost en lugar de usar la variable de entorno.</div>
+      <div class="error-fix">✅ Solución: Cambiar a process.env.REACT_APP_API_URL || 'http://localhost:5000/api' y hacer push.</div>
+    </div>
+
+    <div class="error-card">
+      <div class="error-title">ENOTFOUND MYSQLHOST</div>
+      <div class="error-cause">❌ Causa: Las variables DB_HOST, DB_USER, etc. se guardaron como texto plano "MYSQLHOST" en lugar de referencias a las variables de MySQL.</div>
+      <div class="error-fix">✅ Solución: En Railway Variables, usar el ícono &#123;&#125; → "Add Reference" → seleccionar $&#123;&#123;MySQL.MYSQLHOST&#125;&#125; etc.</div>
+    </div>
+
+    <div class="error-card">
+      <div class="error-title">No repositories found en Railway</div>
+      <div class="error-cause">❌ Causa: El repo es de otro usuario y Railway no tiene acceso.</div>
+      <div class="error-fix">✅ Solución: Descargar el ZIP del repo original, subirlo a un repo propio en GitHub, y conectar ese repo a Railway.</div>
+    </div>
+
+    <div class="error-card">
+      <div class="error-title">There was an error deploying from source</div>
+      <div class="error-cause">❌ Causa: El Root Directory está mal configurado o vacío.</div>
+      <div class="error-fix">✅ Solución: Verificar la estructura del repo en GitHub y configurar Root Directory como "profesor-ratings-app/backend".</div>
+    </div>
+  </div>
+
+  <!-- URLs finales -->
+  <hr class="divider">
+  <div class="section">
+    <div class="section-header">
+      <div class="step-number" style="background:rgba(0,212,170,0.2);color:var(--vercel);border:1px solid rgba(0,212,170,0.4);">✓</div>
+      <div>
+        <div class="section-title">URLs finales del proyecto</div>
+        <div class="section-subtitle">Una vez completado el deploy</div>
+      </div>
+    </div>
+    <div class="urls-grid">
+      <div class="url-card frontend">
+        <div class="url-label">Frontend · Vercel</div>
+        <div class="url-value">https://profesor-ratings-frontend.vercel.app</div>
+      </div>
+      <div class="url-card backend">
+        <div class="url-label">Backend · Railway</div>
+        <div class="url-value">https://tu-dominio.railway.app/api/health</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <p>Facultad de Ingeniería · USAC · Desarrollo Web · Marzo 2026</p>
+    <p style="margin-top:8px; color:#3a3a55;">Railway (backend + MySQL) + Vercel (frontend) · Deploy 100% gratuito</p>
+  </div>
+
+</div>
+</body>
+</html>

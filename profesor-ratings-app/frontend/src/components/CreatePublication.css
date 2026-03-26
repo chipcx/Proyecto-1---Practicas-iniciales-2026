@@ -1,0 +1,39 @@
+/* Estilos para crear publicación */
+.create-publication {
+  background: white;
+  padding: 3rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.create-publication h2 {
+  color: #2c3e50;
+  margin-bottom: 2rem;
+}
+
+.create-publication form {
+  display: flex;
+  flex-direction: column;
+}
+
+.create-publication .form-group select {
+  cursor: pointer;
+}
+
+.create-publication textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.create-publication .btn-primary {
+  align-self: flex-start;
+  margin-top: 1rem;
+}
+
+@media (max-width: 600px) {
+  .create-publication {
+    padding: 2rem;
+  }
+}

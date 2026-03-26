@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manual de Exposición — Deploy Rating de Catedráticos</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f1117;
+    --card: #161b27;
+    --card2: #1e2535;
+    --border: #2a3347;
+    --accent: #4f8ef7;
+    --green: #34d399;
+    --yellow: #fbbf24;
+    --red: #f87171;
+    --purple: #a78bfa;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --mono: 'DM Mono', monospace;
+    --serif: 'DM Serif Display', Georgia, serif;
+    --sans: 'DM Sans', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    line-height: 1.6;
+  }
+
+  /* SIDEBAR NAV */
+  .nav {
+    position: fixed;
+    left: 0; top: 0; bottom: 0;
+    width: 220px;
+    background: var(--card);
+    border-right: 1px solid var(--border);
+    padding: 32px 0;
+    overflow-y: auto;
+    z-index: 100;
+  }
+
+  .nav-logo {
+    padding: 0 20px 24px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 16px;
+  }
+
+  .nav-logo span {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  .nav-logo strong {
+    font-family: var(--serif);
+    font-size: 18px;
+    color: var(--text);
+  }
+
+  .nav a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 20px;
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 13px;
+    transition: all 0.15s;
+    border-left: 2px solid transparent;
+  }
+
+  .nav a:hover, .nav a.active {
+    color: var(--text);
+    background: var(--card2);
+    border-left-color: var(--accent);
+  }
+
+  .nav a .icon { font-size: 16px; flex-shrink: 0; }
+  .nav-section {
+    padding: 16px 20px 6px;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-family: var(--mono);
+  }
+
+  /* MAIN */
+  .main {
+    margin-left: 220px;
+    min-height: 100vh;
+  }
+
+  /* HERO */
+  .hero {
+    background: linear-gradient(135deg, #0f1117 0%, #1a1f35 50%, #0f1117 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 80px 60px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -100px; right: -100px;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(79,142,247,0.1) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero .tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: rgba(79,142,247,0.1);
+    border: 1px solid rgba(79,142,247,0.3);
+    padding: 4px 12px;
+    border-radius: 100px;
+    display: inline-block;
+    margin-bottom: 20px;
+  }
+
+  .hero h1 {
+    font-family: var(--serif);
+    font-size: clamp(36px, 4vw, 56px);
+    line-height: 1.1;
+    margin-bottom: 16px;
+  }
+
+  .hero p {
+    font-size: 17px;
+    color: var(--muted);
+    max-width: 560px;
+    margin-bottom: 32px;
+  }
+
+  .hero-badges {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .badge {
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 5px 12px;
+    border-radius: 6px;
+    font-weight: 500;
+  }
+
+  .badge-blue { background: rgba(79,142,247,0.15); color: var(--accent); border: 1px solid rgba(79,142,247,0.3); }
+  .badge-green { background: rgba(52,211,153,0.15); color: var(--green); border: 1px solid rgba(52,211,153,0.3); }
+  .badge-purple { background: rgba(167,139,250,0.15); color: var(--purple); border: 1px solid rgba(167,139,250,0.3); }
+  .badge-yellow { background: rgba(251,191,36,0.15); color: var(--yellow); border: 1px solid rgba(251,191,36,0.3); }
+
+  /* CONTENT */
+  .content {
+    padding: 60px;
+    max-width: 900px;
+  }
+
+  /* SECTION */
+  .section {
+    margin-bottom: 72px;
+    scroll-margin-top: 32px;
+  }
+
+  .section-eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+
+  .section h2 {
+    font-family: var(--serif);
+    font-size: 32px;
+    margin-bottom: 8px;
+    line-height: 1.2;
+  }
+
+  .section .section-desc {
+    color: var(--muted);
+    font-size: 15px;
+    margin-bottom: 32px;
+    max-width: 600px;
+  }
+
+  /* SPEAK CARD */
+  .speak-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px 28px;
+    margin-bottom: 20px;
+    position: relative;
+  }
+
+  .speak-card::before {
+    content: '🎤 LO QUE DECÍS';
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--green);
+    display: block;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .speak-card p {
+    font-size: 15px;
+    line-height: 1.8;
+    color: #cbd5e1;
+  }
+
+  .speak-card strong { color: var(--text); }
+  .speak-card em { color: var(--yellow); font-style: normal; font-family: var(--mono); font-size: 13px; }
+
+  /* WHY CARD */
+  .why-card {
+    background: var(--card2);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--purple);
+    border-radius: 0 10px 10px 0;
+    padding: 18px 22px;
+    margin-bottom: 20px;
+  }
+
+  .why-card::before {
+    content: '💡 POR QUÉ SE HACE ASÍ';
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--purple);
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  .why-card p { font-size: 14px; color: #94a3b8; line-height: 1.7; }
+  .why-card strong { color: var(--text); }
+
+  /* SHOW CARD */
+  .show-card {
+    background: var(--card2);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--yellow);
+    border-radius: 0 10px 10px 0;
+    padding: 18px 22px;
+    margin-bottom: 20px;
+  }
+
+  .show-card::before {
+    content: '🖥️ LO QUE MOSTRÁS EN PANTALLA';
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--yellow);
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  .show-card p { font-size: 14px; color: #94a3b8; line-height: 1.7; }
+  .show-card strong { color: var(--text); }
+  .show-card ul { list-style: none; margin-top: 8px; }
+  .show-card ul li { font-size: 14px; color: #94a3b8; padding: 3px 0; }
+  .show-card ul li::before { content: '→ '; color: var(--yellow); }
+
+  /* CODE BLOCK */
+  .code-wrap {
+    background: #080d14;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+
+  .code-header {
+    background: var(--card2);
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .code-header span {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .code-header .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dot-red { background: #ff5f57; }
+  .dot-yellow { background: #febc2e; }
+  .dot-green { background: #28c840; }
+
+  .code-wrap pre {
+    padding: 20px;
+    overflow-x: auto;
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.8;
+  }
+
+  .c-old { color: #f87171; text-decoration: line-through; opacity: 0.7; }
+  .c-new { color: #34d399; }
+  .c-comment { color: #475569; }
+  .c-key { color: #fbbf24; }
+  .c-val { color: #60a5fa; }
+  .c-str { color: #a78bfa; }
+
+  /* STEPS */
+  .steps {
+    list-style: none;
+    counter-reset: s;
+    margin-bottom: 20px;
+  }
+
+  .steps li {
+    counter-increment: s;
+    display: flex;
+    gap: 14px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+    align-items: flex-start;
+  }
+
+  .steps li:last-child { border-bottom: none; }
+
+  .steps li::before {
+    content: counter(s);
+    background: var(--accent);
+    color: white;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 500;
+    min-width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  /* VAR TABLE */
+  .var-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    font-size: 13px;
+  }
+
+  .var-table th {
+    background: var(--card2);
+    padding: 10px 14px;
+    text-align: left;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .var-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+
+  .var-table tr:last-child td { border-bottom: none; }
+  .var-table .vk { font-family: var(--mono); color: var(--yellow); }
+  .var-table .vv { font-family: var(--mono); color: var(--accent); font-size: 12px; }
+  .var-table .vn { color: var(--muted); font-size: 12px; }
+
+  /* TIP */
+  .tip {
+    border-radius: 8px;
+    padding: 14px 18px;
+    font-size: 13px;
+    margin-bottom: 20px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    line-height: 1.6;
+  }
+
+  .tip-icon { flex-shrink: 0; font-size: 16px; }
+  .tip.warn { background: rgba(251,191,36,0.08); border: 1px solid rgba(251,191,36,0.2); color: #fcd34d; }
+  .tip.info { background: rgba(79,142,247,0.08); border: 1px solid rgba(79,142,247,0.2); color: #93c5fd; }
+  .tip.success { background: rgba(52,211,153,0.08); border: 1px solid rgba(52,211,153,0.2); color: #6ee7b7; }
+
+  /* DIVIDER */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 48px 0;
+  }
+
+  /* URLS */
+  .url-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+
+  .url-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 20px;
+  }
+
+  .url-card .ul { font-family: var(--mono); font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+  .url-card .uv { font-family: var(--mono); font-size: 12px; color: var(--accent); word-break: break-all; font-weight: 500; }
+
+  /* INLINE CODE */
+  code {
+    font-family: var(--mono);
+    background: var(--card2);
+    border: 1px solid var(--border);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    color: var(--yellow);
+  }
+
+  /* CREDENTIALS */
+  .creds {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin-bottom: 20px;
+  }
+
+  .creds h4 {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--green);
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .creds table { width: 100%; font-size: 13px; }
+  .creds td { padding: 6px 0; }
+  .creds .ck { font-family: var(--mono); color: var(--muted); width: 140px; }
+  .creds .cv { font-family: var(--mono); color: var(--green); }
+
+  @media(max-width:768px) {
+    .nav { display: none; }
+    .main { margin-left: 0; }
+    .hero, .content { padding: 32px 20px; }
+    .url-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-logo">
+    <span>Tutoría 2026</span>
+    <strong>Deploy Guide</strong>
+  </div>
+  <div class="nav-section">Introducción</div>
+  <a href="#arquitectura" class="active"><span class="icon">🏗️</span> Arquitectura</a>
+  <div class="nav-section">Deploy</div>
+  <a href="#railway-db"><span class="icon">🗄️</span> MySQL en Railway</a>
+  <a href="#railway-backend"><span class="icon">⚙️</span> Backend en Railway</a>
+  <a href="#variables"><span class="icon">🔑</span> Variables de entorno</a>
+  <a href="#vercel"><span class="icon">▲</span> Frontend en Vercel</a>
+  <div class="nav-section">Código</div>
+  <a href="#cambio-api"><span class="icon">✏️</span> Cambio en api.js</a>
+  <a href="#migracion"><span class="icon">🔄</span> Migración automática</a>
+  <a href="#cors"><span class="icon">🔒</span> CORS</a>
+  <div class="nav-section">Resultado</div>
+  <a href="#urls"><span class="icon">🌐</span> URLs finales</a>
+  <a href="#demo"><span class="icon">▶️</span> Demo en vivo</a>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="tag">USAC · Facultad de Ingeniería · Desarrollo Web 2026</div>
+    <h1>Deploy de App Web<br>a la Nube — Gratis</h1>
+    <p>Cómo subir una aplicación React + Node.js + MySQL a internet usando Railway y Vercel, sin pagar nada.</p>
+    <div class="hero-badges">
+      <span class="badge badge-blue">React.js</span>
+      <span class="badge badge-green">Node.js + Express</span>
+      <span class="badge badge-yellow">MySQL</span>
+      <span class="badge badge-blue">Railway</span>
+      <span class="badge badge-purple">Vercel</span>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- ARQUITECTURA -->
+    <div class="section" id="arquitectura">
+      <div class="section-eyebrow">01 — Introducción</div>
+      <h2>¿Cómo está construida la app?</h2>
+      <p class="section-desc">Antes de explicar el deploy, hay que entender las tres partes de la aplicación.</p>
+
+      <div class="speak-card">
+        <p>"Esta aplicación tiene <strong>tres capas separadas</strong>. El <strong>frontend</strong> hecho en React es lo que el usuario ve en el navegador. El <strong>backend</strong> hecho en Node.js con Express es el servidor que recibe las peticiones y aplica la lógica de negocio. Y la <strong>base de datos</strong> en MySQL guarda toda la información permanentemente."</p>
+        <br>
+        <p>"Cuando alguien se registra en la app, pasan tres cosas: el <strong>frontend manda los datos</strong> al backend via HTTP, el <strong>backend valida y encripta</strong> la contraseña, y finalmente <strong>guarda el usuario</strong> en MySQL."</p>
+      </div>
+
+      <div class="show-card">
+        <ul>
+          <li>Mostrar la URL del frontend en Vercel funcionando</li>
+          <li>Mostrar el diagrama: Vercel → Railway Backend → Railway MySQL</li>
+        </ul>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- RAILWAY DB -->
+    <div class="section" id="railway-db">
+      <div class="section-eyebrow">02 — Base de Datos</div>
+      <h2>MySQL en Railway</h2>
+      <p class="section-desc">Railway nos da una base de datos MySQL completamente configurada en segundos.</p>
+
+      <div class="speak-card">
+        <p>"Para el deploy usamos <strong>Railway</strong>, una plataforma que nos permite hostear aplicaciones y bases de datos de forma gratuita. Primero creamos un proyecto nuevo y agregamos un servicio de <strong>MySQL</strong>."</p>
+        <br>
+        <p>"Lo importante aquí es que Railway nos genera automáticamente todas las credenciales — el host, el usuario, la contraseña y el puerto. No tenemos que instalar MySQL ni configurar nada manualmente. Todo queda listo en menos de un minuto."</p>
+      </div>
+
+      <div class="show-card">
+        <ul>
+          <li>Mostrar Railway → proyecto → servicio MySQL → pestaña Variables</li>
+          <li>Señalar las variables: MYSQLHOST, MYSQLPASSWORD, MYSQLDATABASE</li>
+          <li>Decir: "estas credenciales las vamos a referenciar desde el backend"</li>
+        </ul>
+      </div>
+
+      <div class="why-card">
+        <p>Railway usa <strong>contenedores Docker</strong> para correr MySQL. Cuando creamos el servicio, Railway levanta un contenedor con MySQL ya configurado y nos expone un puerto público para conectarnos. Internamente, los servicios del mismo proyecto se comunican por una red privada usando el hostname <code>mysql.railway.internal</code>.</p>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- RAILWAY BACKEND -->
+    <div class="section" id="railway-backend">
+      <div class="section-eyebrow">03 — Servidor</div>
+      <h2>Backend en Railway</h2>
+      <p class="section-desc">Railway lee nuestro repositorio de GitHub y hace el deploy automáticamente.</p>
+
+      <div class="speak-card">
+        <p>"Dentro del mismo proyecto de Railway, agregamos un segundo servicio conectando nuestro <strong>repositorio de GitHub</strong>. Railway detecta automáticamente que es una aplicación Node.js, instala las dependencias y la levanta."</p>
+        <br>
+        <p>"Como nuestro repositorio tiene <strong>dos carpetas</strong> — backend y frontend — le decimos a Railway que solo mire la carpeta del backend configurando el <strong>Root Directory</strong>."</p>
+      </div>
+
+      <div class="show-card">
+        <ul>
+          <li>Mostrar Railway → servicio DesarrolloWeb → Settings</li>
+          <li>Señalar Root Directory: <strong>profesor-ratings-app/backend</strong></li>
+          <li>Mostrar que el deploy dice "Deployment successful"</li>
+          <li>Mostrar los logs: "Conectado a MySQL" y "Migración completada"</li>
+        </ul>
+      </div>
+
+      <div class="why-card">
+        <p>Si no configuramos el Root Directory, Railway intenta buildear desde la raíz del repo y no encuentra el <code>package.json</code> del backend. Al apuntarle a la subcarpeta correcta, Railway encuentra el archivo y sabe exactamente qué instalar y cómo iniciar el servidor.</p>
+      </div>
+
+      <div class="tip info">
+        <span class="tip-icon">ℹ️</span>
+        <span><strong>Importante:</strong> El backend y MySQL deben estar en el <strong>mismo proyecto</strong> de Railway. Así pueden comunicarse internamente sin pasar por internet, lo que es más rápido y seguro.</span>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- VARIABLES -->
+    <div class="section" id="variables">
+      <div class="section-eyebrow">04 — Configuración</div>
+      <h2>Variables de entorno</h2>
+      <p class="section-desc">Las variables de entorno reemplazan el archivo .env en producción.</p>
+
+      <div class="speak-card">
+        <p>"En desarrollo usamos un archivo <em>.env</em> en nuestra computadora con contraseñas y configuración. Ese archivo <strong>nunca se sube a GitHub</strong> por seguridad. En producción, Railway nos permite configurar esas mismas variables directamente en la plataforma."</p>
+        <br>
+        <p>"Para las credenciales de MySQL usamos <strong>referencias</strong> — en lugar de copiar y pegar la contraseña, le decimos a Railway que tome el valor directamente del servicio MySQL que está en el mismo proyecto. Si la contraseña cambia algún día, se actualiza automáticamente en todos lados."</p>
+      </div>
+
+      <div class="show-card">
+        <ul>
+          <li>Mostrar Railway → servicio backend → Variables</li>
+          <li>Señalar que DB_HOST tiene el valor <strong>mysql.railway.internal</strong> (referencia resuelta)</li>
+          <li>Señalar CORS_ORIGIN con la URL de Vercel</li>
+        </ul>
+      </div>
+
+      <table class="var-table">
+        <thead>
+          <tr><th>Variable</th><th>Valor</th><th>Por qué</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="vk">DB_HOST</td><td class="vv">${{MySQL.MYSQLHOST}}</td><td class="vn">Referencia al host interno de MySQL</td></tr>
+          <tr><td class="vk">DB_USER</td><td class="vv">${{MySQL.MYSQLUSER}}</td><td class="vn">Usuario root de MySQL</td></tr>
+          <tr><td class="vk">DB_PASSWORD</td><td class="vv">${{MySQL.MYSQLPASSWORD}}</td><td class="vn">Contraseña generada por Railway</td></tr>
+          <tr><td class="vk">DB_NAME</td><td class="vv">${{MySQL.MYSQLDATABASE}}</td><td class="vn">Nombre de la BD: "railway"</td></tr>
+          <tr><td class="vk">DB_PORT</td><td class="vv">${{MySQL.MYSQLPORT}}</td><td class="vn">Puerto interno: 3306</td></tr>
+          <tr><td class="vk">NODE_ENV</td><td class="vv">production</td><td class="vn">Activa modo producción en Express</td></tr>
+          <tr><td class="vk">JWT_SECRET</td><td class="vv">clave_secreta</td><td class="vn">Para firmar tokens de autenticación</td></tr>
+          <tr><td class="vk">PORT</td><td class="vv">5000</td><td class="vn">Puerto donde escucha el servidor</td></tr>
+          <tr><td class="vk">CORS_ORIGIN</td><td class="vv">URL de Vercel</td><td class="vn">Solo acepta peticiones de nuestro frontend</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <hr class="divider">
+
+    <!-- CAMBIO EN API.JS -->
+    <div class="section" id="cambio-api">
+      <div class="section-eyebrow">05 — Cambio en el código</div>
+      <h2>El cambio que había que hacer en api.js</h2>
+      <p class="section-desc">Este fue el cambio más importante en el código antes del deploy.</p>
+
+      <div class="speak-card">
+        <p>"Cuando revisamos el código del frontend, encontramos que el archivo que maneja todas las peticiones HTTP tenía la URL del backend <strong>escrita fija</strong> como localhost. Eso funciona perfectamente cuando trabajamos en nuestra computadora, pero en producción localhost no existe."</p>
+        <br>
+        <p>"El cambio fue simple: en lugar de tener la URL hardcodeada, ahora el código <strong>lee una variable de entorno</strong>. Si existe esa variable, la usa. Si no existe, cae de vuelta a localhost para desarrollo. Así el mismo código funciona en ambos ambientes."</p>
+      </div>
+
+      <div class="code-wrap">
+        <div class="code-header">
+          <div class="dot dot-red"></div>
+          <div class="dot dot-yellow"></div>
+          <div class="dot dot-green"></div>
+          <span>frontend/src/services/api.js</span>
+        </div>
+        <pre><span class="c-comment">// ANTES — URL fija, no funciona en producción ❌</span>
+<span class="c-old">const API_URL = 'http://localhost:5000/api';</span>
+
+<span class="c-comment">// DESPUÉS — Lee variable de entorno, cae a localhost si no existe ✅</span>
+<span class="c-new">const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';</span></pre>
+      </div>
+
+      <div class="why-card">
+        <p>En React, las variables de entorno deben empezar con <strong>REACT_APP_</strong> para que estén disponibles en el navegador. Es una medida de seguridad de React que evita exponer accidentalmente variables del servidor al cliente. La variable <code>REACT_APP_API_URL</code> la configuramos en Vercel con la URL de Railway.</p>
+      </div>
+
+      <div class="show-card">
+        <ul>
+          <li>Mostrar el archivo api.js en VS Code con el cambio</li>
+          <li>Mostrar Vercel → Settings → Environment Variables → REACT_APP_API_URL</li>
+        </ul>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- MIGRACION -->
+    <div class="section" id="migracion">
+      <div class="section-eyebrow">06 — Automatización</div>
+      <h2>Migración automática de tablas</h2>
+      <p class="section-desc">Las tablas se crean solas cuando el servidor inicia por primera vez.</p>
+
+      <div class="speak-card">
+        <p>"Normalmente para crear las tablas en la base de datos necesitaríamos conectarnos con una herramienta como MySQL Workbench o TablePlus y ejecutar el schema manualmente. Eso es un paso extra que puede fallar."</p>
+        <br>
+        <p>"Para evitar eso, agregamos un <strong>script de migración</strong> al backend. Cuando el servidor inicia, antes de aceptar cualquier petición, revisa si las tablas existen. Si no existen, las crea automáticamente. Usamos <em>CREATE TABLE IF NOT EXISTS</em> para que no falle si las tablas ya están creadas."</p>
+      </div>
+
+      <div class="code-wrap">
+        <div class="code-header">
+          <div class="dot dot-red"></div>
+          <div class="dot dot-yellow"></div>
+          <div class="dot dot-green"></div>
+          <span>backend/server.js</span>
+        </div>
+        <pre><span class="c-key">const</span> migrate = require(<span class="c-str">'./src/config/migrate'</span>);
+
+<span class="c-comment">// Primero crea las tablas, luego inicia el servidor</span>
+migrate()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(<span class="c-str">`Servidor en puerto ${PORT}`</span>);
+    });
+  });</pre>
+      </div>
+
+      <div class="show-card">
+        <ul>
+          <li>Mostrar Railway → backend → Deploy Logs</li>
+          <li>Señalar: <strong>"✅ Migración completada — tablas listas"</strong></li>
+          <li>Señalar: <strong>"Conectado a la base de datos MySQL"</strong></li>
+          <li>Señalar: <strong>"Servidor corriendo en puerto 5000"</strong></li>
+        </ul>
+      </div>
+
+      <div class="why-card">
+        <p>El orden importa: primero nos conectamos a MySQL, luego corremos la migración, y solo después levantamos el servidor. Si alguno de esos pasos falla, el proceso termina con error y Railway nos avisa. Esto evita que el servidor quede corriendo sin tablas.</p>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- CORS -->
+    <div class="section" id="cors">
+      <div class="section-eyebrow">07 — Seguridad</div>
+      <h2>¿Qué es CORS y por qué importa?</h2>
+      <p class="section-desc">CORS es el mecanismo que controla qué dominios pueden hacer peticiones al backend.</p>
+
+      <div class="speak-card">
+        <p>"CORS significa <strong>Cross-Origin Resource Sharing</strong>. Es una medida de seguridad del navegador que bloquea peticiones entre dominios diferentes. Por ejemplo, si nuestro frontend está en Vercel y el backend en Railway, son dominios distintos."</p>
+        <br>
+        <p>"Si no configuramos CORS, el navegador bloquea todas las peticiones del frontend al backend con un error. La solución es decirle al backend qué dominios están autorizados para hacer peticiones. En este caso, solo permitimos la URL de Vercel."</p>
+      </div>
+
+      <div class="code-wrap">
+        <div class="code-header">
+          <div class="dot dot-red"></div>
+          <div class="dot dot-yellow"></div>
+          <div class="dot dot-green"></div>
+          <span>backend/src/app.js</span>
+        </div>
+        <pre><span class="c-key">app</span>.use(cors({
+  <span class="c-val">origin</span>: process.env.<span class="c-str">CORS_ORIGIN</span> || <span class="c-str">'http://localhost:3000'</span>,
+  <span class="c-val">credentials</span>: <span class="c-key">true</span>
+}));</pre>
+      </div>
+
+      <div class="why-card">
+        <p>La variable <code>CORS_ORIGIN</code> en Railway tiene el valor <strong>https://desarrollo-web-12026-ejemplo.vercel.app</strong>. Solo peticiones desde esa URL son aceptadas. Cualquier otro dominio recibe error 403. En desarrollo cae a localhost:3000 automáticamente.</p>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- VERCEL -->
+    <div class="section" id="vercel">
+      <div class="section-eyebrow">08 — Frontend</div>
+      <h2>Deploy del frontend en Vercel</h2>
+      <p class="section-desc">Vercel está especializado en frontends React y hace el build automáticamente.</p>
+
+      <div class="speak-card">
+        <p>"Para el frontend usamos <strong>Vercel</strong>, que está especializado en aplicaciones React. La ventaja es que el plan gratuito es prácticamente ilimitado para frontends estáticos."</p>
+        <br>
+        <p>"El proceso es igual que Railway — conectamos el repositorio de GitHub, le decimos que la carpeta del frontend es <em>profesor-ratings-app/frontend</em>, y configuramos la variable de entorno con la URL del backend de Railway. Vercel buildea la app con <em>npm run build</em> y la despliega en una CDN global."</p>
+      </div>
+
+      <div class="show-card">
+        <ul>
+          <li>Mostrar vercel.com → proyecto → último deployment "Ready"</li>
+          <li>Mostrar Settings → Environment Variables → REACT_APP_API_URL</li>
+          <li>Abrir la URL del frontend en el navegador</li>
+        </ul>
+      </div>
+
+      <div class="tip success">
+        <span class="tip-icon">✅</span>
+        <span>Cada vez que hacemos <strong>git push</strong> al repositorio, Vercel y Railway detectan el cambio automáticamente y hacen un nuevo deploy. No hay que hacer nada manual.</span>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- URLS FINALES -->
+    <div class="section" id="urls">
+      <div class="section-eyebrow">09 — Resultado</div>
+      <h2>URLs del proyecto</h2>
+
+      <div class="url-grid">
+        <div class="url-card">
+          <div class="ul">Frontend · Vercel</div>
+          <div class="uv">https://desarrollo-web-12026-ejemplo.vercel.app</div>
+        </div>
+        <div class="url-card">
+          <div class="ul">Backend · Railway</div>
+          <div class="uv">https://desarrolloweb12026ejemplo-production.up.railway.app/api/health</div>
+        </div>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- DEMO -->
+    <div class="section" id="demo">
+      <div class="section-eyebrow">10 — Demo en vivo</div>
+      <h2>Qué mostrar en la demo</h2>
+
+      <div class="speak-card">
+        <p>"Les voy a mostrar la aplicación funcionando en producción. Pueden entrar desde su celular ahora mismo."</p>
+      </div>
+
+      <ul class="steps">
+        <li>Abrir <strong>https://desarrollo-web-12026-ejemplo.vercel.app</strong> en el navegador</li>
+        <li>Mostrar la página de login — explicar que hay usuarios de prueba</li>
+        <li>Iniciar sesión con <strong>ana.sis@usac.edu.gt</strong> / contraseña: <strong>123456</strong></li>
+        <li>Mostrar las publicaciones de ejemplo en la página principal</li>
+        <li>Filtrar por tipo <strong>"curso"</strong> y ID <strong>1</strong> (IPC2)</li>
+        <li>Crear una publicación nueva para demostrar que funciona en vivo</li>
+        <li>Mostrar los comentarios de una publicación</li>
+      </ul>
+
+      <div class="creds">
+        <h4>👤 Usuarios de prueba (contraseña: 123456)</h4>
+        <table>
+          <tr><td class="ck">Email</td><td class="cv">ana.sis@usac.edu.gt</td></tr>
+          <tr><td class="ck">Email</td><td class="cv">luis.dev@usac.edu.gt</td></tr>
+          <tr><td class="ck">Email</td><td class="cv">maria.code@usac.edu.gt</td></tr>
+          <tr><td class="ck">Contraseña</td><td class="cv">123456 (para todos)</td></tr>
+        </table>
+      </div>
+
+      <div class="tip warn">
+        <span class="tip-icon">⚠️</span>
+        <span>Railway puede tardar ~30 segundos en responder la primera petición si el servidor estuvo inactivo. Es normal en el plan gratuito — el servidor "duerme" cuando no hay tráfico.</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // Highlight active nav link on scroll
+  const sections = document.querySelectorAll('.section');
+  const navLinks = document.querySelectorAll('.nav a');
+
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(s => {
+      if (window.scrollY >= s.offsetTop - 100) current = s.id;
+    });
+    navLinks.forEach(a => {
+      a.classList.remove('active');
+      if (a.getAttribute('href') === '#' + current) a.classList.add('active');
+    });
+  });
+</script>
+
+</body>
+</html>
