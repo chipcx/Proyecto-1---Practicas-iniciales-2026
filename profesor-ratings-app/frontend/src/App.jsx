@@ -46,18 +46,50 @@ function App() {
         {/* Navbar */}
         <nav className="navbar">
           <div className="navbar-container">
-            <h1 className="navbar-brand">Rating de Catedráticos</h1>
+
+            {/* Logo / Nombre */}
+            <h1
+              className="navbar-brand"
+              style={{ cursor: 'pointer' }}
+              onClick={() => window.location.href = '/'}
+            >
+              Rating de Catedráticos
+            </h1>
+
+            {/* Acciones */}
             <div className="nav-links">
-              {user ? (
+              {user && (
                 <>
+                  {/* Botón buscar */}
+                  <button
+                    onClick={() => window.location.href = '/search'}
+                    className="btn btn-secondary"
+                  >
+                    Buscar
+                  </button>
+
+                  {/* Botón perfil */}
+                  <button
+                    onClick={() => window.location.href = `/profile/${user.registro_academico}`}
+                    className="btn btn-primary"
+                  >
+                    Mi Perfil
+                  </button>
+
+                  {/* Nombre usuario */}
                   <span className="user-info">
-                    Bienvenido, {user.nombres}
+                    {user.nombres}
                   </span>
-                  <button onClick={handleLogout} className="btn btn-logout">
+
+                  {/* Logout */}
+                  <button
+                    onClick={handleLogout}
+                    className="btn btn-logout"
+                  >
                     Cerrar Sesión
                   </button>
                 </>
-              ) : null}
+              )}
             </div>
           </div>
         </nav>
@@ -69,7 +101,7 @@ function App() {
               <>
                 <Route path="/login" element={<LoginForm onLoginSuccess={handleLoginSuccess} />} />
                 <Route path="/register" element={<RegisterForm onRegisterSuccess={handleRegisterSuccess} />} />
-                
+
                 {/*  Nuevas rutas */}
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
