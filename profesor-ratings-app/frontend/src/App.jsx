@@ -5,10 +5,12 @@ import RegisterForm from './components/RegisterForm';
 import PublicationList from './components/PublicationList';
 import CreatePublication from './components/CreatePublication';
 import PublicationDetail from './components/PublicationDetail';
+import UserProfile from './components/UserProfile';
 
 function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [searchRegistro, setSearchRegistro] = useState('');
 
   useEffect(() => {
     // Verificar si hay usuario logueado
@@ -21,6 +23,13 @@ function App() {
 
   const handleLoginSuccess = (userData) => {
     setUser(userData);
+  };
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchRegistro.trim()) {
+      window.location.href = `/profile/${searchRegistro.trim()}`;
+    }
   };
 
   const handleLogout = () => {
@@ -48,6 +57,18 @@ function App() {
             <div className="nav-links">
               {user ? (
                 <>
+                  <form onSubmit={handleSearch} style={{ display: 'inline-flex', alignItems: 'center', marginRight: '1rem', gap: '0.5rem' }}>
+                    <input 
+                      type="text" 
+                      placeholder="Buscar por registro..." 
+                      value={searchRegistro}
+                      onChange={(e) => setSearchRegistro(e.target.value)}
+                      style={{ padding: '0.4rem', borderRadius: '4px', border: '1px solid #ccc' }}
+                    />
+                    <button type="submit" className="btn" style={{ padding: '0.4rem 0.8rem', backgroundColor: '#e2e8f0', color: '#333' }}>
+                      Buscar perfil
+                    </button>
+                  </form>
                   <span className="user-info">
                     Bienvenido, {user.nombres}
                   </span>
@@ -74,6 +95,7 @@ function App() {
                 <Route path="/" element={<PublicationList />} />
                 <Route path="/create" element={<CreatePublication onPublicationCreated={() => window.location.href = '/'} />} />
                 <Route path="/publication/:id" element={<PublicationDetail />} />
+                <Route path="/profile/:registro" element={<UserProfile />} />
                 <Route path="*" element={<Navigate to="/" />} />
               </>
             )}
