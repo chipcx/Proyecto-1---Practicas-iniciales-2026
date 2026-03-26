@@ -14,11 +14,10 @@ export default function ForgotPassword() {
       const res = await AuthService.forgotPassword(registro, email);
       setMensaje(res.data.message || "Token generado, revisa tu correo");
     } catch (err) {
-  // Mostrar el mensaje real que manda el backend
-  setMensaje(err.response?.data?.error || "Error al solicitar recuperación");
-  console.error("Error en forgot-password:", err.response?.data); // opcional, para ver en consola
-}
-
+      //  Mostrar el mensaje real que manda el backend
+      setMensaje(err.response?.data?.error || "Error al solicitar recuperación");
+      console.error("Error en forgot-password:", err.response?.data); // opcional, para ver en consola
+    }
   };
 
   return (
