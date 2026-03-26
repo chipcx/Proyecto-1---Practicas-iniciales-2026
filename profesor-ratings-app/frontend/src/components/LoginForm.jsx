@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import AuthService from '../services/authService';
 import './LoginForm.css';
 
@@ -28,12 +29,14 @@ const LoginForm = ({ onLoginSuccess }) => {
   return (
     <div className="login-container">
       <div className="login-form">
-        <h2>Iniciar Sesión</h2>
+        <h2>Bienvenido</h2>
+        <p className="subtitle">Inicia sesión para continuar</p>
+
         {error && <div className="alert alert-danger">{error}</div>}
         
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="email">Email:</label>
+            <label htmlFor="email">Email</label>
             <input
               id="email"
               type="email"
@@ -45,7 +48,7 @@ const LoginForm = ({ onLoginSuccess }) => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="password">Contraseña:</label>
+            <label htmlFor="password">Contraseña</label>
             <input
               id="password"
               type="password"
@@ -65,13 +68,14 @@ const LoginForm = ({ onLoginSuccess }) => {
           </button>
         </form>
 
-        <p className="signup-link">
-          ¿No tienes cuenta? <a href="/register">Regístrate aquí</a>
+        <p className="forgot-link">
+          <Link to="/forgot-password">¿Olvidaste tu contraseña?</Link>
         </p>
 
-        {/* 🔹 Nuevo enlace para recuperación */}
-        <p className="forgot-link">
-          ¿Olvidaste tu contraseña? <a href="/forgot-password">Recupérala aquí</a>
+        <div className="form-divider">o</div>
+
+        <p className="signup-link">
+          ¿No tienes cuenta? <Link to="/register">Crear cuenta</Link>
         </p>
       </div>
     </div>

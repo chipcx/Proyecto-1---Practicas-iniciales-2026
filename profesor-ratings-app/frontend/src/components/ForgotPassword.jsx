@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import AuthService from "../services/authService";
 import "./LoginForm.css";
 
@@ -7,18 +8,17 @@ export default function ForgotPassword() {
   const [email, setEmail] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [step, setStep] = useState(1); // 1 = verify, 2 = set new password
+  const [step, setStep] = useState(1);
   const [mensaje, setMensaje] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-  // Step 1: Verify identity
   const handleVerify = async (e) => {
     e.preventDefault();
     setError("");
     setMensaje("");
     setLoading(true);
-
     try {
       const res = await AuthService.forgotPassword(registro, email);
       setMensaje(res.data.message || "Usuario verificado");
@@ -30,7 +30,6 @@ export default function ForgotPassword() {
     }
   };
 
-  // Step 2: Set new password
   const handleReset = async (e) => {
     e.preventDefault();
     setError("");
@@ -40,18 +39,16 @@ export default function ForgotPassword() {
       setError("La contraseña debe tener al menos 6 caracteres");
       return;
     }
-
     if (newPassword !== confirmPassword) {
       setError("Las contraseñas no coinciden");
       return;
     }
 
     setLoading(true);
-
     try {
       const res = await AuthService.resetPassword(registro, email, newPassword);
       setMensaje(res.data.message || "Contraseña actualizada con éxito");
-      setStep(3); // show success
+      setStep(3);
     } catch (err) {
       setError(err.response?.data?.error || "Error al actualizar contraseña");
     } finally {
@@ -63,19 +60,28 @@ export default function ForgotPassword() {
     <div className="login-container">
       <div className="login-form">
         <h2>Recuperar Contraseña</h2>
+        <p className="subtitle">
+          {step === 1 && "Verifica tu identidad para continuar"}
+          {step === 2 && "Establece tu nueva contraseña"}
+          {step === 3 && "¡Proceso completado!"}
+        </p>
+
+        {/* Step indicators */}
+        <div className="step-indicator">
+          <span className={`step-dot ${step >= 1 ? (step > 1 ? 'done' : 'active') : ''}`}></span>
+          <span className={`step-dot ${step >= 2 ? (step > 2 ? 'done' : 'active') : ''}`}></span>
+          <span className={`step-dot ${step >= 3 ? 'done' : ''}`}></span>
+        </div>
 
         {error && <div className="alert alert-danger">{error}</div>}
-        {mensaje && <div className="alert alert-success" style={{ color: '#28a745', background: '#d4edda', padding: '0.75rem', borderRadius: '4px', marginBottom: '1rem' }}>{mensaje}</div>}
+        {mensaje && <div className="alert alert-success">{mensaje}</div>}
 
         {step === 1 && (
           <form onSubmit={handleVerify}>
-            <p style={{ color: '#666', marginBottom: '1rem' }}>
-              Ingresa tu registro académico y email para verificar tu identidad.
-            </p>
             <div className="form-group">
-              <label htmlFor="registro">Registro Académico:</label>
+              <label htmlFor="fp-registro">Registro Académico</label>
               <input
-                id="registro"
+                id="fp-registro"
                 type="text"
                 placeholder="Ej: 202100001"
                 value={registro}
@@ -84,9 +90,9 @@ export default function ForgotPassword() {
               />
             </div>
             <div className="form-group">
-              <label htmlFor="forgot-email">Email:</label>
+              <label htmlFor="fp-email">Email</label>
               <input
-                id="forgot-email"
+                id="fp-email"
                 type="email"
                 placeholder="tu@email.com"
                 value={email}
@@ -95,20 +101,17 @@ export default function ForgotPassword() {
               />
             </div>
             <button type="submit" disabled={loading} className="btn btn-primary">
-              {loading ? 'Verificando...' : 'Verificar Identidad'}
+              {loading ? "Verificando..." : "Verificar Identidad"}
             </button>
           </form>
         )}
 
         {step === 2 && (
           <form onSubmit={handleReset}>
-            <p style={{ color: '#666', marginBottom: '1rem' }}>
-              Identidad verificada. Ingresa tu nueva contraseña.
-            </p>
             <div className="form-group">
-              <label htmlFor="new-password">Nueva Contraseña:</label>
+              <label htmlFor="fp-newpass">Nueva Contraseña</label>
               <input
-                id="new-password"
+                id="fp-newpass"
                 type="password"
                 placeholder="Mínimo 6 caracteres"
                 value={newPassword}
@@ -118,9 +121,9 @@ export default function ForgotPassword() {
               />
             </div>
             <div className="form-group">
-              <label htmlFor="confirm-password">Confirmar Contraseña:</label>
+              <label htmlFor="fp-confirm">Confirmar Contraseña</label>
               <input
-                id="confirm-password"
+                id="fp-confirm"
                 type="password"
                 placeholder="Repite la contraseña"
                 value={confirmPassword}
@@ -129,25 +132,26 @@ export default function ForgotPassword() {
               />
             </div>
             <button type="submit" disabled={loading} className="btn btn-primary">
-              {loading ? 'Actualizando...' : 'Cambiar Contraseña'}
+              {loading ? "Actualizando..." : "Cambiar Contraseña"}
             </button>
           </form>
         )}
 
         {step === 3 && (
-          <div>
-            <p style={{ textAlign: 'center', marginTop: '1rem' }}>
-              ✅ Tu contraseña fue actualizada exitosamente.
+          <div style={{ textAlign: 'center' }}>
+            <p style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>🎉</p>
+            <p style={{ color: 'var(--color-text-secondary)', marginBottom: '1.5rem' }}>
+              Tu contraseña fue actualizada exitosamente.
             </p>
-            <a href="/login" className="btn btn-primary" style={{ display: 'block', textAlign: 'center', marginTop: '1rem', textDecoration: 'none' }}>
+            <button onClick={() => navigate('/login')} className="btn btn-primary" style={{ width: '100%' }}>
               Ir a Iniciar Sesión
-            </a>
+            </button>
           </div>
         )}
 
         {step !== 3 && (
-          <p className="signup-link" style={{ marginTop: '1rem' }}>
-            <a href="/login">← Volver al Login</a>
+          <p className="signup-link">
+            <Link to="/login">← Volver al Login</Link>
           </p>
         )}
       </div>

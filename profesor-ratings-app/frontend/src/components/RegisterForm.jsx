@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import AuthService from '../services/authService';
+import './LoginForm.css';
 import './RegisterForm.css';
 
 const RegisterForm = ({ onRegisterSuccess }) => {
@@ -60,13 +62,15 @@ const RegisterForm = ({ onRegisterSuccess }) => {
 
   return (
     <div className="register-container">
-      <div className="register-form">
+      <div className="login-form register-form">
         <h2>Crear Cuenta</h2>
+        <p className="subtitle">Regístrate para comenzar</p>
+
         {error && <div className="alert alert-danger">{error}</div>}
         
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="registro">Registro Académico:</label>
+            <label htmlFor="registro">Registro Académico</label>
             <input
               id="registro"
               type="text"
@@ -79,7 +83,7 @@ const RegisterForm = ({ onRegisterSuccess }) => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="nombres">Nombres:</label>
+            <label htmlFor="nombres">Nombres</label>
             <input
               id="nombres"
               type="text"
@@ -92,7 +96,7 @@ const RegisterForm = ({ onRegisterSuccess }) => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="apellidos">Apellidos:</label>
+            <label htmlFor="apellidos">Apellidos</label>
             <input
               id="apellidos"
               type="text"
@@ -105,9 +109,9 @@ const RegisterForm = ({ onRegisterSuccess }) => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="email">Email:</label>
+            <label htmlFor="reg-email">Email</label>
             <input
-              id="email"
+              id="reg-email"
               type="email"
               name="email"
               value={formData.email}
@@ -118,20 +122,20 @@ const RegisterForm = ({ onRegisterSuccess }) => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="password">Contraseña:</label>
+            <label htmlFor="reg-password">Contraseña</label>
             <input
-              id="password"
+              id="reg-password"
               type="password"
               name="password"
               value={formData.password}
               onChange={handleChange}
               required
-              placeholder="••••••••"
+              placeholder="Mínimo 6 caracteres"
             />
           </div>
 
           <div className="form-group">
-            <label htmlFor="confirmPassword">Confirmar Contraseña:</label>
+            <label htmlFor="confirmPassword">Confirmar Contraseña</label>
             <input
               id="confirmPassword"
               type="password"
@@ -148,12 +152,14 @@ const RegisterForm = ({ onRegisterSuccess }) => {
             disabled={loading}
             className="btn btn-primary"
           >
-            {loading ? 'Registrando...' : 'Registrarse'}
+            {loading ? 'Registrando...' : 'Crear Cuenta'}
           </button>
         </form>
 
+        <div className="form-divider">o</div>
+
         <p className="login-link">
-          ¿Ya tienes cuenta? <a href="/login">Inicia sesión aquí</a>
+          ¿Ya tienes cuenta? <Link to="/login">Iniciar sesión</Link>
         </p>
       </div>
     </div>

@@ -1,16 +1,21 @@
-/* Estilos para crear publicación */
+/* ---- Create Publication ---- */
 .create-publication {
-  background: white;
-  padding: 3rem;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  max-width: 600px;
+  background: var(--color-surface);
+  padding: 2.5rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-lg);
+  max-width: 640px;
   margin: 0 auto;
+  animation: fadeInUp 0.4s ease;
 }
 
 .create-publication h2 {
-  color: #2c3e50;
-  margin-bottom: 2rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 1.5rem;
+  letter-spacing: -0.02em;
 }
 
 .create-publication form {
@@ -24,16 +29,17 @@
 
 .create-publication textarea {
   resize: vertical;
-  min-height: 120px;
+  min-height: 130px;
 }
 
 .create-publication .btn-primary {
   align-self: flex-start;
-  margin-top: 1rem;
+  margin-top: 0.5rem;
+  padding: 0.7rem 2rem;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 640px) {
   .create-publication {
-    padding: 2rem;
+    padding: 1.5rem;
   }
 }

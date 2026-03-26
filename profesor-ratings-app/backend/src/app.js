@@ -5,8 +5,13 @@ require('dotenv').config();
 const app = express();
 
 // Middlewares globales
+// CORS — permitir cualquier origen (para que funcione con Vercel, Render, etc.)
+const allowedOrigins = process.env.CORS_ORIGIN
+  ? process.env.CORS_ORIGIN.split(',').map(s => s.trim())
+  : null;
+
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
+  origin: allowedOrigins || true,  // true = reflect request origin
   credentials: true
 }));
 

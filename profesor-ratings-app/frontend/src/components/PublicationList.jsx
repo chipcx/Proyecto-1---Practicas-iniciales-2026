@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import PublicationService from '../services/publicationService';
 import './PublicationList.css';
 
@@ -8,6 +8,7 @@ const PublicationList = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [page, setPage] = useState(1);
+  const navigate = useNavigate();
 
   // Filter state
   const [filterType, setFilterType] = useState('');
@@ -25,7 +26,7 @@ const PublicationList = () => {
       if (catedraticoNombre.trim()) filters.catedratico_nombre = catedraticoNombre.trim();
 
       const response = await PublicationService.getAllPublications(page, 20, filters);
-      setPublications(response.data.publications || response.data);
+      setPublications(response.data.publications || []);
     } catch (err) {
       setError('Error al cargar publicaciones');
       console.error(err);
@@ -41,7 +42,6 @@ const PublicationList = () => {
   const handleFilter = (e) => {
     e.preventDefault();
     setPage(1);
-    fetchPublications();
   };
 
   const handleClear = () => {
@@ -53,7 +53,12 @@ const PublicationList = () => {
 
   return (
     <div className="publication-list">
-      <h2>Publicaciones</h2>
+      <div className="actions-bar">
+        <h2>📋 Publicaciones</h2>
+        <button onClick={() => navigate('/create')} className="btn btn-primary">
+          ✏️ Nueva Publicación
+        </button>
+      </div>
 
       <div className="filter-section">
         <form onSubmit={handleFilter}>
@@ -61,11 +66,10 @@ const PublicationList = () => {
             <select
               value={filterType}
               onChange={(e) => setFilterType(e.target.value)}
-              style={{ padding: '0.5rem', borderRadius: '4px', border: '1px solid #ddd' }}
             >
               <option value="">Todos los tipos</option>
-              <option value="curso">Curso</option>
-              <option value="catedratico">Catedrático</option>
+              <option value="curso">📚 Cursos</option>
+              <option value="catedratico">👨‍🏫 Catedráticos</option>
             </select>
 
             <input
@@ -82,12 +86,8 @@ const PublicationList = () => {
               onChange={(e) => setCatedraticoNombre(e.target.value)}
             />
 
-            <button type="submit" className="btn btn-secondary">Buscar</button>
-            <button 
-              type="button" 
-              className="btn btn-secondary"
-              onClick={handleClear}
-            >
+            <button type="submit" className="btn btn-primary">Buscar</button>
+            <button type="button" className="btn btn-secondary" onClick={handleClear}>
               Limpiar
             </button>
           </div>
@@ -95,32 +95,34 @@ const PublicationList = () => {
       </div>
 
       {error && <div className="alert alert-danger">{error}</div>}
-      {loading && <div className="alert alert-info">Cargando...</div>}
+      {loading && <div className="alert alert-info">Cargando publicaciones...</div>}
 
       <div className="publications">
-        {publications.length > 0 ? (
+        {!loading && publications.length > 0 ? (
           publications.map(pub => (
             <div key={pub.id} className="publication-card">
               <div className="publication-header">
                 <h4>{pub.nombres} {pub.apellidos}</h4>
                 <span className="date">
-                  {new Date(pub.fecha_creacion).toLocaleDateString('es-ES')}
+                  {new Date(pub.fecha_creacion).toLocaleDateString('es-ES', {
+                    day: 'numeric', month: 'short', year: 'numeric'
+                  })}
                 </span>
               </div>
               <div className="publication-meta">
                 <span className="type">
-                  {pub.tipo === 'curso' ? '📚 Curso' : '👨‍🏫 Catedrático'}
-                  {pub.nombre_referencia && `: ${pub.nombre_referencia}`}
+                  {pub.tipo === 'curso' ? '📚' : '👨‍🏫'}{' '}
+                  {pub.nombre_referencia || pub.tipo}
                 </span>
               </div>
               <p className="content">{pub.contenido}</p>
               <Link to={`/publication/${pub.id}`} className="btn btn-link">
-                Ver comentarios →
+                💬 Ver comentarios →
               </Link>
             </div>
           ))
         ) : (
-          <p className="empty-state">No hay publicaciones disponibles</p>
+          !loading && <p className="empty-state">No hay publicaciones que coincidan con tu búsqueda</p>
         )}
       </div>
 
