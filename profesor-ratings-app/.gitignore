@@ -1,12 +1,12 @@
 # Dependencias
-**/node_modules/
+node_modules/
 npm-debug.log
 yarn-error.log
 
 # Variables de entorno
-**/.env
-**/.env.local
-**/.env.*.local
+.env
+.env.local
+.env.*.local
 
 # IDE
 .vscode/

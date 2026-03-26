@@ -5,16 +5,16 @@ import RegisterForm from './components/RegisterForm';
 import PublicationList from './components/PublicationList';
 import CreatePublication from './components/CreatePublication';
 import PublicationDetail from './components/PublicationDetail';
-import UserProfile from './components/UserProfile';
-import SearchProfile from './components/SearchProfile';
-import { Link } from 'react-router-dom';
+
+// 🔹 Importamos los nuevos componentes
+import ForgotPassword from './components/ForgotPassword';
+import ResetPassword from './components/ResetPassword';
 
 function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Verificar si hay usuario logueado
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
       setUser(JSON.parse(storedUser));
@@ -33,7 +33,6 @@ function App() {
   };
 
   const handleRegisterSuccess = () => {
-    // Redirigir a login
     window.location.href = '/login';
   };
 
@@ -47,31 +46,19 @@ function App() {
         {/* Navbar */}
         <nav className="navbar">
           <div className="navbar-container">
-
-            <h1 className="navbar-brand">⭐ Rating de Catedráticos</h1>
-
-            {user && (
-              <div className="nav-actions">
-
-                <Link to="/search" className="nav-btn secondary">
-                  🔍 Buscar
-                </Link>
-
-                <Link to={`/profile/${user.registro_academico}`} className="nav-btn primary">
-                  👤 Mi Perfil
-                </Link>
-
-                <span className="user-info">
-                  {user.nombres}
-                </span>
-
-                <button onClick={handleLogout} className="nav-btn logout">
-                  Cerrar sesión
-                </button>
-
-              </div>
-            )}
-
+            <h1 className="navbar-brand">Rating de Catedráticos</h1>
+            <div className="nav-links">
+              {user ? (
+                <>
+                  <span className="user-info">
+                    Bienvenido, {user.nombres}
+                  </span>
+                  <button onClick={handleLogout} className="btn btn-logout">
+                    Cerrar Sesión
+                  </button>
+                </>
+              ) : null}
+            </div>
           </div>
         </nav>
 
@@ -82,6 +69,11 @@ function App() {
               <>
                 <Route path="/login" element={<LoginForm onLoginSuccess={handleLoginSuccess} />} />
                 <Route path="/register" element={<RegisterForm onRegisterSuccess={handleRegisterSuccess} />} />
+                
+                {/*  Nuevas rutas */}
+                <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
+
                 <Route path="*" element={<Navigate to="/login" />} />
               </>
             ) : (
@@ -89,8 +81,6 @@ function App() {
                 <Route path="/" element={<PublicationList />} />
                 <Route path="/create" element={<CreatePublication onPublicationCreated={() => window.location.href = '/'} />} />
                 <Route path="/publication/:id" element={<PublicationDetail />} />
-                <Route path="/profile/:registro" element={<UserProfile />} />
-                <Route path="/search" element={<SearchProfile />} />
                 <Route path="*" element={<Navigate to="/" />} />
               </>
             )}
