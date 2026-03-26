@@ -46,7 +46,7 @@ function App() {
         {/* Navbar */}
         <nav className="navbar">
           <div className="navbar-container">
-            <h1 className="navbar-brand">Rating de Catedráticos</h1>
+            <h1 className="navbar-brand">⭐ Rating de Catedráticos</h1>
             <div className="nav-links">
               {user ? (
                 <>

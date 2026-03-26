@@ -24,7 +24,7 @@ app.use('/api/courses', require('./routes/courses'));
 // Ruta de prueba
 app.get('/api/health', (req, res) => {
   res.json({ 
-    message: 'Servidor funcionando correctamente',
+    message: 'Servidor funcionando correctamente 🟢',
     timestamp: new Date().toISOString()
   });
 });
