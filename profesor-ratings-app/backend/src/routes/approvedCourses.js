@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const ApprovedCoursesModel = require('../models/ApprovedCoursesModel');
-const authMiddleware = require('../middleware/authMiddleware');
+const authMiddleware = require('../middlewares/auth');
 
 // Obtener cursos de un usuario
 router.get('/:userId', async (req, res) => {
