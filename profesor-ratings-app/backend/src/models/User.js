@@ -36,6 +36,12 @@ class UserModel {
     return rows[0] || null;
   }
 
+  static async findByRegistroAcademico(registro_academico) {
+    const query = 'SELECT id, registro_academico, nombres, apellidos, email, fecha_creacion FROM usuarios WHERE registro_academico = ?';
+    const [rows] = await pool.execute(query, [registro_academico]);
+    return rows[0] || null;
+  }
+
   static async update(id, userData) {
     const updates = Object.keys(userData)
       .map(key => `${key} = ?`)
