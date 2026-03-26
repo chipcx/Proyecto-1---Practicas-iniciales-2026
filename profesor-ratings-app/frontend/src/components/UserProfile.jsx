@@ -90,6 +90,16 @@ const UserProfile = () => {
   const handleAddCourse = async () => {
     if (!selectedCourse) return;
 
+    if(calificacion){
+      const nota = parseInt(calificacion,10);
+    
+    if(nota <61){
+      setError('la nota deber se 61 para considerar el cuerso como aprobado');
+      return;
+    }
+  }
+  
+     
     try {
       await courseService.addApprovedCourse(profileData.id, {
         curso_id: selectedCourse,
@@ -115,6 +125,8 @@ const UserProfile = () => {
       console.error(err);
     }
   };
+
+  
 
   // Permite manejar la actualización del perfil del usuario, validando que los campos no estén vacíos y actualizando la información tanto en el estado local como en el almacenamiento local si es el propio perfil
   const handleSubmit = async (e) => {

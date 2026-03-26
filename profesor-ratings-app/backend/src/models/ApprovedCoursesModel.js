@@ -33,6 +33,10 @@ class ApprovedCoursesModel {
     await pool.execute(query, [userId, cursoId]);
     return { message: 'Curso eliminado' };
   }
+  
+
 }
+
+
 
 module.exports = ApprovedCoursesModel;
