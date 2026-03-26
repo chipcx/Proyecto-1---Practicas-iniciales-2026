@@ -47,38 +47,31 @@ function App() {
         {/* Navbar */}
         <nav className="navbar">
           <div className="navbar-container">
+
             <h1 className="navbar-brand">⭐ Rating de Catedráticos</h1>
-            <div className="nav-links">
-              {user ? (
-                <>
-                  <button onClick={() => window.location.href = '/search'} className="btn" style={{ marginRight: '1rem', padding: '0.4rem 1rem', backgroundColor: '#e2e8f0', color: '#333', fontWeight: 'bold' }}>
-                    🔍 Buscar Perfiles
-                  </button>
-                  <span className="user-info" style={{ marginLeft: '1rem' }}>
-                    Bienvenido, {user.nombres}
-                  </span>
 
-                  <Link
-                    to={`/profile/${user.registro_academico}`}
-                    className="btn"
-                    style={{
-                      marginLeft: '1rem',
-                      padding: '0.4rem 1rem',
-                      backgroundColor: '#0066cc',
-                      color: '#fff',
-                      fontWeight: 'bold',
-                      textDecoration: 'none'
-                    }}
-                  >
-                    👤 Mi Perfil
-                  </Link>
+            {user && (
+              <div className="nav-actions">
 
-                  <button onClick={handleLogout} className="btn btn-logout">
-                    Cerrar Sesión
-                  </button>
-                </>
-              ) : null}
-            </div>
+                <Link to="/search" className="nav-btn secondary">
+                  🔍 Buscar
+                </Link>
+
+                <Link to={`/profile/${user.registro_academico}`} className="nav-btn primary">
+                  👤 Mi Perfil
+                </Link>
+
+                <span className="user-info">
+                  {user.nombres}
+                </span>
+
+                <button onClick={handleLogout} className="nav-btn logout">
+                  Cerrar sesión
+                </button>
+
+              </div>
+            )}
+
           </div>
         </nav>
 
