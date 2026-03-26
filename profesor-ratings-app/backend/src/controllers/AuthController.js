@@ -1,7 +1,6 @@
 const bcrypt = require('bcryptjs');
 const { generateToken } = require('../utils/jwt');
 const UserModel = require('../models/User');
-const jwt = require('jsonwebtoken');
 
 class AuthController {
   static async register(req, res) {
@@ -68,7 +67,8 @@ class AuthController {
           id: user.id,
           email: user.email,
           nombres: user.nombres,
-          apellidos: user.apellidos
+          apellidos: user.apellidos,
+          registro_academico: user.registro_academico
         }
       });
     } catch (error) {
@@ -89,7 +89,7 @@ class AuthController {
     }
   }
 
-  //  Nuevo: flujo de recuperación de contraseña
+  // Flujo simplificado: verificar identidad con registro + email
   static async forgotPassword(req, res) {
     try {
       const { registro_academico, email } = req.body;
@@ -100,42 +100,37 @@ class AuthController {
 
       const user = await UserModel.findByEmail(email);
       if (!user || user.registro_academico !== registro_academico) {
-        return res.status(400).json({ error: 'Datos incorrectos' });
+        return res.status(400).json({ error: 'Datos incorrectos. Verifique su registro académico y email.' });
       }
 
-      const resetToken = jwt.sign(
-        { id: user.id },
-        process.env.JWT_SECRET,
-        { expiresIn: '15m' }
-      );
-
-      await UserModel.updateResetToken(user.id, resetToken);
-
-      // Aquí normalmente enviarías un correo con el link
-      res.json({ message: 'Se envió un enlace de recuperación al correo registrado' });
+      // Identidad verificada — el frontend mostrará el formulario de nueva contraseña
+      res.json({ message: 'Usuario verificado. Puede establecer su nueva contraseña.' });
     } catch (error) {
       console.error('Error en forgotPassword:', error);
       res.status(500).json({ error: 'Error al procesar solicitud' });
     }
   }
 
+  // Restablecer contraseña directamente con verificación de identidad
   static async resetPassword(req, res) {
     try {
-      const { token, nuevaContraseña } = req.body;
-      if (!token || !nuevaContraseña) {
-        return res.status(400).json({ error: 'Token y nueva contraseña requeridos' });
+      const { registro_academico, email, newPassword } = req.body;
+
+      if (!registro_academico || !email || !newPassword) {
+        return res.status(400).json({ error: 'Todos los campos son requeridos' });
       }
 
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      const user = await UserModel.findById(decoded.id);
-
-      if (!user || user.reset_token !== token) {
-        return res.status(400).json({ error: 'Token inválido o expirado' });
+      if (newPassword.length < 6) {
+        return res.status(400).json({ error: 'La contraseña debe tener al menos 6 caracteres' });
       }
 
-      const hashedPassword = await bcrypt.hash(nuevaContraseña, 10);
+      const user = await UserModel.findByEmail(email);
+      if (!user || user.registro_academico !== registro_academico) {
+        return res.status(400).json({ error: 'Datos incorrectos' });
+      }
+
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
       await UserModel.updatePassword(user.id, hashedPassword);
-      await UserModel.updateResetToken(user.id, null);
 
       res.json({ message: 'Contraseña actualizada correctamente' });
     } catch (error) {

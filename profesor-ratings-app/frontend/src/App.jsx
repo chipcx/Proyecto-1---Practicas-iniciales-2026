@@ -5,10 +5,9 @@ import RegisterForm from './components/RegisterForm';
 import PublicationList from './components/PublicationList';
 import CreatePublication from './components/CreatePublication';
 import PublicationDetail from './components/PublicationDetail';
-
-// 🔹 Importamos los nuevos componentes
 import ForgotPassword from './components/ForgotPassword';
-import ResetPassword from './components/ResetPassword';
+import SearchProfile from './components/SearchProfile';
+import UserProfile from './components/UserProfile';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -101,11 +100,7 @@ function App() {
               <>
                 <Route path="/login" element={<LoginForm onLoginSuccess={handleLoginSuccess} />} />
                 <Route path="/register" element={<RegisterForm onRegisterSuccess={handleRegisterSuccess} />} />
-
-                {/*  Nuevas rutas */}
                 <Route path="/forgot-password" element={<ForgotPassword />} />
-                <Route path="/reset-password" element={<ResetPassword />} />
-
                 <Route path="*" element={<Navigate to="/login" />} />
               </>
             ) : (
@@ -113,6 +108,8 @@ function App() {
                 <Route path="/" element={<PublicationList />} />
                 <Route path="/create" element={<CreatePublication onPublicationCreated={() => window.location.href = '/'} />} />
                 <Route path="/publication/:id" element={<PublicationDetail />} />
+                <Route path="/search" element={<SearchProfile />} />
+                <Route path="/profile/:registro" element={<UserProfile />} />
                 <Route path="*" element={<Navigate to="/" />} />
               </>
             )}

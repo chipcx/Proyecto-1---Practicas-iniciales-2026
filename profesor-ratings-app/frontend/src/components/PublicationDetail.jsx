@@ -65,8 +65,10 @@ const PublicationDetail = () => {
           <span className="date">{new Date(publication.fecha_creacion).toLocaleDateString('es-ES')}</span>
         </div>
         <div className="publication-meta">
-          <span className="type">Tipo: {publication.tipo}</span>
-          <span className="ref">ID: {publication.referencia_id}</span>
+          <span className="type">
+            {publication.tipo === 'curso' ? '📚 Curso' : '👨‍🏫 Catedrático'}
+            {publication.nombre_referencia && `: ${publication.nombre_referencia}`}
+          </span>
         </div>
         <p className="content">{publication.contenido}</p>
       </div>

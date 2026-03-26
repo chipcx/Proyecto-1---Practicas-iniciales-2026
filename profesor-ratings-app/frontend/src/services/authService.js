@@ -6,12 +6,12 @@ const AuthService = {
   getCurrentUser: () => api.get('/auth/me'),
   logout: () => localStorage.removeItem('token'),
 
-  // Nuevos métodos para recuperación de contraseña
+  // Recuperación de contraseña (flujo simplificado)
   forgotPassword: (registro_academico, email) =>
     api.post('/auth/forgot-password', { registro_academico, email }),
 
-  resetPassword: (token, nuevaContraseña) =>
-    api.post('/auth/reset-password', { token, nuevaContraseña })
+  resetPassword: (registro_academico, email, newPassword) =>
+    api.post('/auth/reset-password', { registro_academico, email, newPassword })
 };
 
 export default AuthService;

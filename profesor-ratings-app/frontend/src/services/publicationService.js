@@ -1,8 +1,10 @@
 import api from './api';
 
 const PublicationService = {
-  getAllPublications: (page = 1, limit = 20) => 
-    api.get(`/publications?page=${page}&limit=${limit}`),
+  getAllPublications: (page = 1, limit = 20, filters = {}) => {
+    const params = { page, limit, ...filters };
+    return api.get('/publications', { params });
+  },
   
   getPublicationById: (id) => 
     api.get(`/publications/${id}`),
@@ -10,10 +12,8 @@ const PublicationService = {
   createPublication: (data) => 
     api.post('/publications', data),
   
-  filterPublications: (tipo, referencia_id) => 
-    api.get('/publications/filter', { 
-      params: { tipo, referencia_id } 
-    })
+  filterPublications: (filters = {}) =>
+    api.get('/publications/filter', { params: filters })
 };
 
 export default PublicationService;

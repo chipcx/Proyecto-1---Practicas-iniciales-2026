@@ -18,6 +18,9 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/publications', require('./routes/publications'));
 app.use('/api/comments', require('./routes/comments'));
 app.use('/api/users', require('./routes/users'));
+app.use('/api/courses', require('./routes/courses'));
+app.use('/api/approved-courses', require('./routes/approvedCourses'));
+app.use('/api/catedraticos', require('./routes/catedraticos'));
 
 // Ruta de prueba
 app.get('/api/health', (req, res) => {

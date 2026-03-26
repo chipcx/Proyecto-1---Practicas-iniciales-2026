@@ -11,7 +11,7 @@ class PublicationModel {
 
     const [result] = await pool.execute(query, [
       usuario_id,
-      tipo, // 'catedratico' o 'curso'
+      tipo,
       referencia_id,
       contenido
     ]);
@@ -19,7 +19,7 @@ class PublicationModel {
     return { id: result.insertId, ...data };
   }
 
-  static async findAll(limit = 20, offset = 0) {
+  static async findAll(limit = 20, offset = 0, filters = {}) {
     const safeLimit = Number(limit);
     const safeOffset = Number(offset);
 
@@ -27,23 +27,56 @@ class PublicationModel {
       throw new Error('Parámetros de paginación inválidos');
     }
 
-    const query = `
+    let query = `
       SELECT p.*, u.nombres, u.apellidos, u.registro_academico
-      FROM publicaciones p
-      JOIN usuarios u ON p.usuario_id = u.id
-      ORDER BY p.fecha_creacion DESC
-      LIMIT ${safeLimit} OFFSET ${safeOffset}
     `;
+    const params = [];
+    let joins = 'JOIN usuarios u ON p.usuario_id = u.id';
+    let where = ' WHERE 1=1';
 
-    const [rows] = await pool.query(query);
+    // Add course/professor name to results based on tipo
+    if (filters.curso_nombre) {
+      joins += ' LEFT JOIN cursos c ON p.referencia_id = c.id AND p.tipo = \'curso\'';
+      where += ' AND p.tipo = \'curso\' AND c.nombre LIKE ?';
+      params.push(`%${filters.curso_nombre}%`);
+      query += ', c.nombre AS nombre_referencia';
+    } else if (filters.catedratico_nombre) {
+      joins += ' LEFT JOIN catedraticos cat ON p.referencia_id = cat.id AND p.tipo = \'catedratico\'';
+      where += ' AND p.tipo = \'catedratico\' AND CONCAT(cat.nombre, \' \', cat.apellido) LIKE ?';
+      params.push(`%${filters.catedratico_nombre}%`);
+      query += ', CONCAT(cat.nombre, \' \', cat.apellido) AS nombre_referencia';
+    } else {
+      // Always try to resolve the reference name
+      joins += ` LEFT JOIN cursos c ON p.referencia_id = c.id AND p.tipo = 'curso'
+                 LEFT JOIN catedraticos cat ON p.referencia_id = cat.id AND p.tipo = 'catedratico'`;
+      query += ', CASE WHEN p.tipo = \'curso\' THEN c.nombre ELSE CONCAT(cat.nombre, \' \', cat.apellido) END AS nombre_referencia';
+    }
+
+    if (filters.tipo) {
+      where += ' AND p.tipo = ?';
+      params.push(filters.tipo);
+    }
+
+    if (filters.referencia_id) {
+      where += ' AND p.referencia_id = ?';
+      params.push(filters.referencia_id);
+    }
+
+    query += ` FROM publicaciones p ${joins} ${where} ORDER BY p.fecha_creacion DESC LIMIT ${safeLimit} OFFSET ${safeOffset}`;
+
+    const [rows] = await pool.query(query, params);
     return rows;
   }
 
   static async findById(id) {
     const query = `
-      SELECT p.*, u.nombres, u.apellidos
+      SELECT p.*, u.nombres, u.apellidos,
+        CASE WHEN p.tipo = 'curso' THEN c.nombre
+             ELSE CONCAT(cat.nombre, ' ', cat.apellido) END AS nombre_referencia
       FROM publicaciones p
       JOIN usuarios u ON p.usuario_id = u.id
+      LEFT JOIN cursos c ON p.referencia_id = c.id AND p.tipo = 'curso'
+      LEFT JOIN catedraticos cat ON p.referencia_id = cat.id AND p.tipo = 'catedratico'
       WHERE p.id = ?
     `;
 
@@ -51,26 +84,41 @@ class PublicationModel {
     return rows[0] || null;
   }
 
-  static async findByFilter(tipo, referencia_id) {
+  static async findByFilter(filters = {}) {
     let query = `
       SELECT p.*, u.nombres, u.apellidos, u.registro_academico
-      FROM publicaciones p
-      JOIN usuarios u ON p.usuario_id = u.id
-      WHERE 1=1
     `;
     const params = [];
+    let joins = 'JOIN usuarios u ON p.usuario_id = u.id';
+    let where = ' WHERE 1=1';
 
-    if (tipo) {
-      query += ' AND tipo = ?';
-      params.push(tipo);
+    if (filters.curso_nombre) {
+      joins += ' LEFT JOIN cursos c ON p.referencia_id = c.id AND p.tipo = \'curso\'';
+      where += ' AND p.tipo = \'curso\' AND c.nombre LIKE ?';
+      params.push(`%${filters.curso_nombre}%`);
+      query += ', c.nombre AS nombre_referencia';
+    } else if (filters.catedratico_nombre) {
+      joins += ' LEFT JOIN catedraticos cat ON p.referencia_id = cat.id AND p.tipo = \'catedratico\'';
+      where += ' AND p.tipo = \'catedratico\' AND CONCAT(cat.nombre, \' \', cat.apellido) LIKE ?';
+      params.push(`%${filters.catedratico_nombre}%`);
+      query += ', CONCAT(cat.nombre, \' \', cat.apellido) AS nombre_referencia';
+    } else {
+      joins += ` LEFT JOIN cursos c ON p.referencia_id = c.id AND p.tipo = 'curso'
+                 LEFT JOIN catedraticos cat ON p.referencia_id = cat.id AND p.tipo = 'catedratico'`;
+      query += ', CASE WHEN p.tipo = \'curso\' THEN c.nombre ELSE CONCAT(cat.nombre, \' \', cat.apellido) END AS nombre_referencia';
     }
 
-    if (referencia_id) {
-      query += ' AND referencia_id = ?';
-      params.push(referencia_id);
+    if (filters.tipo) {
+      where += ' AND p.tipo = ?';
+      params.push(filters.tipo);
     }
 
-    query += ' ORDER BY fecha_creacion DESC';
+    if (filters.referencia_id) {
+      where += ' AND p.referencia_id = ?';
+      params.push(filters.referencia_id);
+    }
+
+    query += ` FROM publicaciones p ${joins} ${where} ORDER BY p.fecha_creacion DESC`;
 
     const [rows] = await pool.execute(query, params);
     return rows;

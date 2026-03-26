@@ -8,21 +8,23 @@ const PublicationList = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [page, setPage] = useState(1);
-  const [filtered, setFiltered] = useState(false);
+
+  // Filter state
   const [filterType, setFilterType] = useState('');
-  const [filterId, setFilterId] = useState('');
+  const [cursoNombre, setCursoNombre] = useState('');
+  const [catedraticoNombre, setCatedraticoNombre] = useState('');
 
   const fetchPublications = useCallback(async () => {
     setLoading(true);
     setError('');
 
     try {
-      let response;
-      if (filtered && (filterType || filterId)) {
-        response = await PublicationService.filterPublications(filterType, filterId);
-      } else {
-        response = await PublicationService.getAllPublications(page);
-      }
+      const filters = {};
+      if (filterType) filters.tipo = filterType;
+      if (cursoNombre.trim()) filters.curso_nombre = cursoNombre.trim();
+      if (catedraticoNombre.trim()) filters.catedratico_nombre = catedraticoNombre.trim();
+
+      const response = await PublicationService.getAllPublications(page, 20, filters);
       setPublications(response.data.publications || response.data);
     } catch (err) {
       setError('Error al cargar publicaciones');
@@ -30,7 +32,7 @@ const PublicationList = () => {
     } finally {
       setLoading(false);
     }
-  }, [page, filtered, filterType, filterId]);
+  }, [page, filterType, cursoNombre, catedraticoNombre]);
 
   useEffect(() => {
     fetchPublications();
@@ -38,7 +40,14 @@ const PublicationList = () => {
 
   const handleFilter = (e) => {
     e.preventDefault();
-    setFiltered(true);
+    setPage(1);
+    fetchPublications();
+  };
+
+  const handleClear = () => {
+    setFilterType('');
+    setCursoNombre('');
+    setCatedraticoNombre('');
     setPage(1);
   };
 
@@ -49,28 +58,35 @@ const PublicationList = () => {
       <div className="filter-section">
         <form onSubmit={handleFilter}>
           <div className="filter-group">
-            <input
-              type="text"
-              placeholder="Filtrar por tipo (catedratico/curso)"
+            <select
               value={filterType}
               onChange={(e) => setFilterType(e.target.value)}
-            />
+              style={{ padding: '0.5rem', borderRadius: '4px', border: '1px solid #ddd' }}
+            >
+              <option value="">Todos los tipos</option>
+              <option value="curso">Curso</option>
+              <option value="catedratico">Catedrático</option>
+            </select>
+
             <input
-              type="number"
-              placeholder="ID de referencia"
-              value={filterId}
-              onChange={(e) => setFilterId(e.target.value)}
+              type="text"
+              placeholder="Buscar por nombre de curso..."
+              value={cursoNombre}
+              onChange={(e) => setCursoNombre(e.target.value)}
             />
-            <button type="submit" className="btn btn-secondary">Filtrar</button>
+
+            <input
+              type="text"
+              placeholder="Buscar por nombre de catedrático..."
+              value={catedraticoNombre}
+              onChange={(e) => setCatedraticoNombre(e.target.value)}
+            />
+
+            <button type="submit" className="btn btn-secondary">Buscar</button>
             <button 
               type="button" 
               className="btn btn-secondary"
-              onClick={() => {
-                setFiltered(false);
-                setFilterType('');
-                setFilterId('');
-                setPage(1);
-              }}
+              onClick={handleClear}
             >
               Limpiar
             </button>
@@ -92,8 +108,10 @@ const PublicationList = () => {
                 </span>
               </div>
               <div className="publication-meta">
-                <span className="type">Tipo: {pub.tipo}</span>
-                <span className="ref">ID: {pub.referencia_id}</span>
+                <span className="type">
+                  {pub.tipo === 'curso' ? '📚 Curso' : '👨‍🏫 Catedrático'}
+                  {pub.nombre_referencia && `: ${pub.nombre_referencia}`}
+                </span>
               </div>
               <p className="content">{pub.contenido}</p>
               <Link to={`/publication/${pub.id}`} className="btn btn-link">

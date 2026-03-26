@@ -37,13 +37,21 @@ class PublicationController {
       const page = Math.max(1, parseInt(req.query.page, 10) || 1);
       const offset = (page - 1) * limit;
 
-      const publications = await PublicationModel.findAll(limit, offset);
+      // Support advanced filters on the main endpoint too
+      const filters = {};
+      if (req.query.tipo) filters.tipo = req.query.tipo;
+      if (req.query.referencia_id) filters.referencia_id = req.query.referencia_id;
+      if (req.query.curso_nombre) filters.curso_nombre = req.query.curso_nombre;
+      if (req.query.catedratico_nombre) filters.catedratico_nombre = req.query.catedratico_nombre;
+
+      const publications = await PublicationModel.findAll(limit, offset, filters);
 
       res.json({
         publications,
         pagination: { page, limit }
       });
     } catch (error) {
+      console.error('Error al obtener publicaciones:', error);
       res.status(500).json({ error: 'Error al obtener publicaciones' });
     }
   }
@@ -71,15 +79,20 @@ class PublicationController {
 
   static async filterPublications(req, res) {
     try {
-      const { tipo, referencia_id } = req.query;
+      const filters = {};
+      if (req.query.tipo) filters.tipo = req.query.tipo;
+      if (req.query.referencia_id) filters.referencia_id = req.query.referencia_id;
+      if (req.query.curso_nombre) filters.curso_nombre = req.query.curso_nombre;
+      if (req.query.catedratico_nombre) filters.catedratico_nombre = req.query.catedratico_nombre;
 
-      const publications = await PublicationModel.findByFilter(tipo, referencia_id);
+      const publications = await PublicationModel.findByFilter(filters);
 
       res.json({
         publications,
-        filters: { tipo, referencia_id }
+        filters
       });
     } catch (error) {
+      console.error('Error al filtrar publicaciones:', error);
       res.status(500).json({ error: 'Error al filtrar publicaciones' });
     }
   }

@@ -9,6 +9,7 @@ const migrate = async () => {
       apellidos VARCHAR(100) NOT NULL,
       email VARCHAR(100) UNIQUE NOT NULL,
       password_hash VARCHAR(255) NOT NULL,
+      reset_token VARCHAR(255) DEFAULT NULL,
       fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       fecha_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     )`,
@@ -101,6 +102,14 @@ const migrate = async () => {
       FROM usuarios u WHERE u.email = 'maria.code@usac.edu.gt'
       AND NOT EXISTS (SELECT 1 FROM publicaciones p WHERE p.usuario_id = u.id AND p.tipo = 'curso' AND p.referencia_id = 4)`
   ];
+
+  // Idempotent ALTER TABLE: add reset_token column if missing
+  try {
+    await pool.execute(`ALTER TABLE usuarios ADD COLUMN reset_token VARCHAR(255) DEFAULT NULL`);
+  } catch (e) {
+    // ER_DUP_FIELDNAME (1060) means column already exists — safe to ignore
+    if (e.errno !== 1060) throw e;
+  }
 
   for (const query of queries) {
     await pool.execute(query);

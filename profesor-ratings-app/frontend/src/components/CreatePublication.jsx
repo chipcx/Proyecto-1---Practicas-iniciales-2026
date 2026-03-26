@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PublicationService from '../services/publicationService';
+import api from '../services/api';
 import './CreatePublication.css';
 
 const CreatePublication = ({ onPublicationCreated }) => {
@@ -12,10 +13,38 @@ const CreatePublication = ({ onPublicationCreated }) => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
+  // Data for dropdowns
+  const [cursos, setCursos] = useState([]);
+  const [catedraticos, setCatedraticos] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [cursosRes, catedraticosRes] = await Promise.all([
+          api.get('/courses'),
+          api.get('/catedraticos')
+        ]);
+        setCursos(cursosRes.data);
+        setCatedraticos(catedraticosRes.data);
+      } catch (err) {
+        console.error('Error al cargar datos:', err);
+      }
+    };
+    fetchData();
+  }, []);
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
+    });
+  };
+
+  const handleTipoChange = (e) => {
+    setFormData({
+      ...formData,
+      tipo: e.target.value,
+      referencia_id: '' // reset selection when changing type
     });
   };
 
@@ -51,6 +80,8 @@ const CreatePublication = ({ onPublicationCreated }) => {
     }
   };
 
+  const options = formData.tipo === 'curso' ? cursos : catedraticos;
+
   return (
     <div className="create-publication">
       <h2>Crear Publicación</h2>
@@ -65,7 +96,7 @@ const CreatePublication = ({ onPublicationCreated }) => {
             id="tipo"
             name="tipo"
             value={formData.tipo}
-            onChange={handleChange}
+            onChange={handleTipoChange}
             required
           >
             <option value="catedratico">Catedrático</option>
@@ -74,16 +105,27 @@ const CreatePublication = ({ onPublicationCreated }) => {
         </div>
 
         <div className="form-group">
-          <label htmlFor="referencia_id">ID de {formData.tipo === 'catedratico' ? 'Catedrático' : 'Curso'}:</label>
-          <input
+          <label htmlFor="referencia_id">
+            {formData.tipo === 'catedratico' ? 'Catedrático' : 'Curso'}:
+          </label>
+          <select
             id="referencia_id"
-            type="number"
             name="referencia_id"
             value={formData.referencia_id}
             onChange={handleChange}
             required
-            placeholder="Ej: 1, 2, 3..."
-          />
+          >
+            <option value="">
+              Selecciona un {formData.tipo === 'catedratico' ? 'catedrático' : 'curso'}
+            </option>
+            {options.map(item => (
+              <option key={item.id} value={item.id}>
+                {formData.tipo === 'curso'
+                  ? `${item.codigo} - ${item.nombre}`
+                  : `${item.nombre} ${item.apellido}`}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div className="form-group">
